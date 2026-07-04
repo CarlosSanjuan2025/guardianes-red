@@ -1,0 +1,1678 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guardianes de la Calidad Educativa Digital</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#04050a; --panel:#0b0f1c; --panel-line:rgba(124,92,255,.22);
+    --violet:#7c5cff; --cyan:#23d5f5; --green:#17e3a1; --red:#ff3b5c;
+    --text:#eef1f8; --muted:#8b93ad;
+    --display:'Space Grotesk',system-ui,sans-serif;
+    --body:'Inter','Segoe UI',system-ui,sans-serif;
+    --mono:'JetBrains Mono',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background:
+      radial-gradient(55% 45% at 12% 0%, rgba(124,92,255,.16), transparent 60%),
+      radial-gradient(45% 40% at 100% 100%, rgba(35,213,245,.10), transparent 60%),
+      var(--bg);
+    background-image:
+      linear-gradient(rgba(124,92,255,.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(124,92,255,.05) 1px, transparent 1px),
+      radial-gradient(55% 45% at 12% 0%, rgba(124,92,255,.16), transparent 60%),
+      radial-gradient(45% 40% at 100% 100%, rgba(35,213,245,.10), transparent 60%),
+      var(--bg);
+    background-size:34px 34px, 34px 34px, auto, auto, auto;
+    color:var(--text); font-family:var(--body); min-height:100%; overflow-x:hidden;
+  }
+  .screen{position:fixed;inset:0;visibility:hidden;opacity:0;overflow-y:auto;pointer-events:none;transition:opacity .4s ease}
+  .screen.active{visibility:visible;opacity:1;pointer-events:all;animation:screenIn .4s ease}
+  @keyframes screenIn{from{opacity:0;transform:scale(.985)}to{opacity:1;transform:scale(1)}}
+  @media (prefers-reduced-motion:reduce){.screen.active{animation:none}}
+
+  .btn{
+    font-family:var(--display);font-weight:700;font-size:15px;letter-spacing:.03em;
+    color:#03040a;background:linear-gradient(135deg,var(--cyan),var(--violet));
+    border:none;border-radius:8px;padding:16px 20px;cursor:pointer;width:100%;
+    box-shadow:0 0 0 1px rgba(255,255,255,.08) inset, 0 10px 30px rgba(124,92,255,.35);
+    transition:transform .18s ease, box-shadow .18s ease;
+    display:flex;align-items:center;justify-content:center;gap:8px;
+  }
+  .btn:hover{transform:translateY(-2px);box-shadow:0 0 0 1px rgba(255,255,255,.12) inset, 0 14px 36px rgba(124,92,255,.5)}
+  .btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+  .btn:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+
+  /* ========== PANTALLA: BIENVENIDA + REGISTRO ========== */
+  #welcome{display:flex;align-items:center;justify-content:center;padding:50px 20px}
+  .w-wrap{max-width:600px;width:100%;text-align:center}
+  .w-seal{width:78px;height:78px;margin:0 auto 22px}
+  .w-seal svg{width:100%;height:100%;filter:drop-shadow(0 0 22px rgba(124,92,255,.6))}
+  .w-title{
+    font-family:var(--display);font-weight:700;letter-spacing:.02em;
+    font-size:clamp(32px,7vw,54px);line-height:1.05;
+    background:linear-gradient(90deg,#fff,var(--cyan) 55%,var(--violet));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .w-title .dot{color:var(--cyan);-webkit-text-fill-color:var(--cyan)}
+  .w-eyebrow{font-family:var(--mono);font-size:12.5px;letter-spacing:.32em;color:var(--cyan);text-transform:uppercase;margin-top:14px}
+  .w-desc{color:var(--muted);font-size:15px;line-height:1.65;max-width:460px;margin:20px auto 0}
+
+  .w-card{
+    margin-top:34px;text-align:left;padding:26px 26px 24px;border-radius:14px;
+    border:1px solid var(--panel-line);background:rgba(11,15,28,.7);backdrop-filter:blur(8px);
+  }
+  .w-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+  .w-card-title{font-family:var(--display);font-weight:700;font-size:15px;display:flex;align-items:center;gap:8px}
+  .w-card-count{font-family:var(--mono);font-size:11px;color:var(--muted)}
+
+  .field-label{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-bottom:7px;display:block}
+  .team-list{display:flex;flex-direction:column;gap:10px;margin-bottom:6px}
+  .team-row{display:flex;gap:8px;align-items:center}
+  .team-row input{
+    flex:1;background:rgba(255,255,255,.03);border:1px solid var(--panel-line);border-radius:8px;
+    padding:13px 14px;color:var(--text);font-family:var(--body);font-size:14.5px;transition:.18s ease;
+  }
+  .team-row input::placeholder{color:#4d5470}
+  .team-row input:focus{outline:none;border-color:var(--cyan);background:rgba(35,213,245,.05)}
+  .team-row .rm-btn{
+    width:40px;height:40px;flex-shrink:0;border-radius:8px;border:1px solid var(--panel-line);
+    background:transparent;color:var(--muted);cursor:pointer;font-size:16px;transition:.18s ease;
+  }
+  .team-row .rm-btn:hover{border-color:var(--red);color:var(--red)}
+  .team-row .rm-btn:disabled{opacity:.25;cursor:not-allowed}
+  .add-member{
+    width:100%;padding:11px;border-radius:8px;border:1px dashed var(--panel-line);
+    background:transparent;color:var(--cyan);font-family:var(--display);font-weight:600;font-size:13px;
+    cursor:pointer;transition:.18s ease;margin-top:4px;
+  }
+  .add-member:hover{border-color:var(--cyan);background:rgba(35,213,245,.06)}
+
+  .w-actions{margin-top:20px}
+  .w-hint{font-size:12px;color:var(--muted);margin-top:12px;line-height:1.5;text-align:center}
+
+  .w-footer{margin-top:32px;font-size:12px;color:#555c78}
+  .w-footer b{color:var(--cyan)}
+
+  /* ========== CENTRO DE OPERACIONES ========== */
+  #hub{padding:0}
+  .hub-topbar{
+    position:sticky;top:0;z-index:10;
+    display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+    padding:14px 28px;border-bottom:1px solid var(--panel-line);
+    background:rgba(4,5,10,.95);backdrop-filter:blur(12px);
+  }
+  .hub-brand{font-family:var(--display);font-weight:700;font-size:15px;letter-spacing:.06em;
+    background:linear-gradient(90deg,var(--cyan),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hub-team{font-family:var(--mono);font-size:12px;color:var(--cyan);background:rgba(35,213,245,.08);
+    padding:5px 12px;border-radius:20px;border:1px solid rgba(35,213,245,.2)}
+  .hub-progress{display:flex;align-items:center;gap:10px}
+  .hub-bar{width:120px;height:7px;border-radius:4px;background:rgba(255,255,255,.07);overflow:hidden;border:1px solid var(--panel-line)}
+  .hub-bar i{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--violet),var(--cyan));transition:width .5s ease}
+  .hub-pct{font-family:var(--mono);font-size:12px;color:var(--cyan);min-width:36px;font-weight:700}
+  .hub-keys{display:flex;gap:6px;align-items:center}
+  .hub-keys-lbl{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.08em;margin-right:4px}
+  .hub-key{
+    width:38px;height:38px;border-radius:9px;border:1.5px solid var(--panel-line);
+    display:flex;align-items:center;justify-content:center;font-size:18px;
+    background:rgba(255,255,255,.03);transition:.4s ease;position:relative;
+  }
+  .hub-key.filled{
+    border-color:var(--green);background:rgba(23,227,161,.12);
+    box-shadow:0 0 16px rgba(23,227,161,.4);
+    animation:keyPop .4s ease;
+  }
+  .hub-key:not(.filled){filter:grayscale(1);opacity:.3}
+  @keyframes keyPop{0%{transform:scale(1)}50%{transform:scale(1.25)}100%{transform:scale(1)}}
+
+  .hub-body{max-width:980px;margin:0 auto;padding:44px 22px 60px}
+  .hub-head{margin-bottom:36px}
+  .hub-title{font-family:var(--display);font-weight:700;font-size:clamp(22px,3.5vw,30px);
+    background:linear-gradient(90deg,#fff 40%,var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hub-sub{color:var(--muted);font-size:14px;margin-top:8px;max-width:520px}
+
+  .exp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  @media(max-width:780px){.exp-grid{grid-template-columns:1fr}}
+
+  .exp-card{
+    padding:28px 22px;border-radius:14px;border:1px solid var(--panel-line);
+    background:linear-gradient(160deg,rgba(124,92,255,.06),rgba(11,15,28,.8));
+    cursor:pointer;transition:.22s ease;position:relative;overflow:hidden;
+  }
+  .exp-card::after{
+    content:'';position:absolute;inset:0;opacity:0;transition:.22s ease;border-radius:14px;
+    background:linear-gradient(135deg,rgba(35,213,245,.08),rgba(124,92,255,.06));
+  }
+  .exp-card:hover:not(.locked)::after{opacity:1}
+  .exp-card:hover:not(.locked){border-color:rgba(35,213,245,.5);transform:translateY(-4px);
+    box-shadow:0 16px 40px rgba(35,213,245,.12)}
+  .exp-card.locked{opacity:.55;cursor:not-allowed}
+  .exp-card.done{border-color:rgba(23,227,161,.45);
+    background:linear-gradient(160deg,rgba(23,227,161,.06),rgba(11,15,28,.8))}
+  .exp-card.done:hover{border-color:var(--green);box-shadow:0 16px 40px rgba(23,227,161,.12)}
+
+  .exp-num{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--violet);margin-bottom:14px;
+    background:rgba(124,92,255,.12);display:inline-block;padding:4px 10px;border-radius:20px;border:1px solid rgba(124,92,255,.2)}
+  .exp-card.done .exp-num{color:var(--green);background:rgba(23,227,161,.1);border-color:rgba(23,227,161,.2)}
+  .exp-icon{font-size:36px;margin-bottom:16px;display:block}
+  .exp-name{font-family:var(--display);font-weight:700;font-size:18px;margin-bottom:10px;line-height:1.25}
+  .exp-desc{font-size:13.5px;color:var(--muted);line-height:1.6;margin-bottom:20px}
+  .exp-badge{
+    display:inline-flex;align-items:center;gap:6px;
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;
+    padding:6px 12px;border-radius:20px;font-weight:600;
+  }
+  .exp-badge.pending{background:rgba(35,213,245,.12);color:var(--cyan);border:1px solid rgba(35,213,245,.25)}
+  .exp-badge.done{background:rgba(23,227,161,.12);color:var(--green);border:1px solid rgba(23,227,161,.25)}
+  .exp-badge.locked{background:rgba(255,255,255,.05);color:#555c78;border:1px solid rgba(255,255,255,.08)}
+
+  .hub-footer{display:flex;justify-content:center;gap:12px;margin-top:36px;flex-wrap:wrap}
+
+  /* tarjeta de celebración al completar los 3 expedientes */
+  .celebrate-card{
+    margin-top:32px;padding:32px 26px;border-radius:16px;text-align:center;
+    border:2px solid var(--green);
+    background:radial-gradient(60% 55% at 50% 0%,rgba(23,227,161,.12),transparent 70%),rgba(11,15,28,.8);
+    animation:celebPulse 2.2s ease-in-out infinite;
+  }
+  @keyframes celebPulse{0%,100%{box-shadow:0 0 20px rgba(23,227,161,.2)}50%{box-shadow:0 0 45px rgba(23,227,161,.5)}}
+  .celeb-keys{display:flex;justify-content:center;gap:10px;margin-bottom:18px}
+  .celeb-key{font-size:28px;animation:keyFloat 1.4s ease-in-out infinite}
+  .celeb-key:nth-child(2){animation-delay:.2s}
+  .celeb-key:nth-child(3){animation-delay:.4s}
+  @keyframes keyFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+  .celeb-title{font-family:var(--display);font-weight:700;font-size:22px;color:var(--green);margin-bottom:6px}
+  .celeb-sub{font-size:13.5px;color:var(--muted);margin-bottom:22px;line-height:1.5}
+  .celeb-btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:10px;
+    font-family:var(--display);font-weight:700;font-size:17px;letter-spacing:.03em;
+    color:#03040a;background:linear-gradient(135deg,var(--green),var(--cyan));
+    border:none;border-radius:10px;padding:18px 40px;cursor:pointer;
+    box-shadow:0 0 0 1px rgba(255,255,255,.1) inset, 0 12px 36px rgba(23,227,161,.4);
+    transition:transform .18s ease, box-shadow .18s ease;
+  }
+  .celeb-btn:hover{transform:translateY(-3px);box-shadow:0 0 0 1px rgba(255,255,255,.14) inset, 0 18px 44px rgba(23,227,161,.6)}
+  .celeb-code{font-family:var(--mono);font-size:11px;color:rgba(23,227,161,.6);margin-top:14px;letter-spacing:.08em}
+
+  /* ========== PANTALLA: BRIEFING DEL RECURSO ========== */
+  #briefing{padding:0}
+  .brief-top{
+    position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:14px;
+    padding:14px 24px;border-bottom:1px solid var(--panel-line);
+    background:rgba(4,5,10,.92);backdrop-filter:blur(10px);
+  }
+  .brief-step{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--violet);text-transform:uppercase}
+  .brief-body{max-width:900px;margin:0 auto;padding:40px 22px 60px}
+  .brief-eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--cyan);text-transform:uppercase;margin-bottom:10px}
+  .brief-title{font-family:var(--display);font-weight:700;font-size:clamp(22px,4vw,30px);margin-bottom:18px}
+  .brief-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px}
+  @media(max-width:680px){.brief-grid{grid-template-columns:1fr}}
+  .brief-info{padding:18px 20px;border:1px solid var(--panel-line);border-radius:10px;background:rgba(11,15,28,.6)}
+  .brief-info-lbl{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+  .brief-info-val{font-family:var(--display);font-weight:600;font-size:15px;color:var(--text)}
+  .brief-desc{font-size:14.5px;line-height:1.75;color:#c7cce0;margin-bottom:28px}
+  .brief-desc strong{color:var(--cyan)}
+
+  /* iframe del recurso */
+  .brief-frame-wrap{border-radius:12px;overflow:hidden;border:1px solid rgba(35,213,245,.25);margin-bottom:28px;background:#04050a}
+  .brief-frame-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 16px;background:rgba(255,255,255,.03);border-bottom:1px solid rgba(35,213,245,.15)}
+  .brief-frame-lbl{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;color:var(--muted)}
+  .brief-frame-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)}
+  .brief-frame-link{font-family:var(--mono);font-size:11px;color:var(--cyan);text-decoration:none;border:1px solid var(--panel-line);border-radius:5px;padding:5px 10px;transition:.18s}
+  .brief-frame-link:hover{border-color:var(--cyan);background:rgba(35,213,245,.06)}
+  .brief-frame-wrap iframe{display:block;width:100%;height:500px;border:none}
+  .brief-frame-note{font-family:var(--mono);font-size:10.5px;color:var(--muted);padding:8px 16px;background:rgba(255,255,255,.02);border-top:1px solid rgba(255,255,255,.05)}
+  #briefIframe{display:block;width:100%;height:500px;border:none}
+
+  /* tarjeta de acceso al recurso */
+  .brief-access-card{padding:36px 24px;text-align:center;background:rgba(11,15,28,.5)}
+  .brief-access-icon{font-size:52px;margin-bottom:16px;filter:drop-shadow(0 0 14px rgba(124,92,255,.5))}
+  .brief-access-title{font-family:var(--display);font-weight:700;font-size:18px;margin-bottom:8px;color:var(--text)}
+  .brief-access-sub{font-size:13.5px;color:var(--muted);margin-bottom:24px;max-width:400px;margin-left:auto;margin-right:auto;line-height:1.5}
+  .brief-access-btns{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+  .brief-btn-explore{
+    font-family:var(--display);font-weight:700;font-size:15px;padding:14px 28px;border-radius:9px;
+    border:none;cursor:pointer;color:#03040a;
+    background:linear-gradient(135deg,var(--cyan),var(--violet));
+    box-shadow:0 8px 26px rgba(124,92,255,.35);transition:.18s ease;
+  }
+  .brief-btn-explore:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(124,92,255,.5)}
+  .brief-btn-tab{
+    font-family:var(--display);font-weight:600;font-size:15px;padding:14px 28px;border-radius:9px;
+    border:1px solid var(--panel-line);color:var(--text);text-decoration:none;
+    background:rgba(255,255,255,.03);transition:.18s ease;display:inline-flex;align-items:center;gap:6px;
+  }
+  .brief-btn-tab:hover{border-color:var(--cyan);color:var(--cyan);background:rgba(35,213,245,.06)}
+  .brief-access-note{font-family:var(--mono);font-size:10.5px;color:#555c78}
+
+  .brief-actions{display:flex;justify-content:center;gap:12px}
+  .brief-actions .btn{width:auto}
+  .btn-ghost{
+    font-family:var(--display);font-weight:600;font-size:13.5px;color:var(--muted);
+    background:transparent;border:1px solid var(--panel-line);border-radius:8px;
+    padding:11px 22px;cursor:pointer;transition:.18s ease;
+  }
+  .btn-ghost:hover{border-color:var(--red);color:var(--red)}
+
+  /* ========== PANTALLA DE EXPEDIENTE ========== */
+  #expediente{padding:0}
+  .exp-topbar{
+    position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:14px;
+    padding:14px 24px;border-bottom:1px solid var(--panel-line);
+    background:rgba(4,5,10,.92);backdrop-filter:blur(10px);
+  }
+  .exp-back{
+    font-family:var(--display);font-weight:600;font-size:13px;color:var(--cyan);
+    background:rgba(35,213,245,.08);border:1px solid rgba(35,213,245,.35);border-radius:7px;
+    padding:9px 16px;cursor:pointer;transition:.18s;display:flex;align-items:center;gap:6px;
+  }
+  .exp-back:hover{background:rgba(35,213,245,.16);border-color:var(--cyan)}
+  .exp-crumb{font-family:var(--mono);font-size:12px;color:var(--muted)}
+  .exp-crumb b{color:var(--cyan)}
+
+  .exp-body{max-width:780px;margin:0 auto;padding:36px 22px 70px}
+  .exp-eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--violet);text-transform:uppercase;margin-bottom:8px}
+  .exp-title{font-family:var(--display);font-weight:700;font-size:clamp(20px,3.5vw,28px);margin-bottom:26px}
+
+  /* tarjeta del recurso */
+  .rec-card{border:1px solid var(--panel-line);border-radius:12px;background:rgba(11,15,28,.6);padding:22px;margin-bottom:22px}
+  .rec-name{font-family:var(--display);font-weight:700;font-size:16px;margin-bottom:10px}
+  .rec-tags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px}
+  .rec-tag{font-family:var(--mono);font-size:10.5px;color:var(--muted);border:1px solid var(--panel-line);border-radius:20px;padding:4px 10px}
+  .rec-desc{font-size:14px;line-height:1.7;color:#c7cce0;margin-bottom:16px}
+
+  /* simulador embebido */
+  .sim-wrap{border-radius:8px;overflow:hidden;border:1px solid rgba(35,213,245,.2);background:#060709}
+  .sim-bar{display:flex;align-items:center;gap:8px;padding:9px 14px;background:rgba(255,255,255,.03);border-bottom:1px solid rgba(35,213,245,.12)}
+  .sim-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)}
+  .sim-lbl{font-family:var(--mono);font-size:10.5px;color:var(--muted);letter-spacing:.05em}
+  .sim-ctrl{padding:12px 16px;background:#0a0c10;border-top:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .sim-ctrl label{font-family:var(--mono);font-size:12px;color:#ffe600}
+  .sim-ctrl input[type=range]{flex:1;min-width:100px;accent-color:#23d5f5}
+  .sim-ctrl .sim-val{font-family:var(--mono);font-size:13px;color:#23d5f5;font-weight:700;min-width:40px;text-align:right}
+  .sim-note{font-family:var(--mono);font-size:10.5px;color:var(--muted);padding:8px 14px;background:#07080d;border-top:1px solid rgba(255,255,255,.05)}
+
+  /* triángulo */
+  .tri-section{display:flex;align-items:flex-start;gap:18px;flex-wrap:wrap;padding:20px 16px 6px}
+  .tri-wrap{position:relative;width:200px;flex-shrink:0;margin:0 auto}
+  .tri-btn{position:absolute;width:44px;height:44px;border-radius:50%;font-family:var(--display);font-weight:700;font-size:18px;cursor:pointer;transition:.22s;background:rgba(35,213,245,.08);border:2px solid rgba(35,213,245,.35);color:var(--cyan);display:flex;align-items:center;justify-content:center}
+  .tri-btn:hover{background:rgba(35,213,245,.18)}
+  .tri-btn.lit{background:linear-gradient(135deg,var(--cyan),var(--violet));color:#04050a;border-color:transparent;box-shadow:0 0 20px rgba(35,213,245,.6)}
+  #tbV{left:calc(50% - 22px);top:0}
+  #tbI{left:-4px;bottom:0}
+  #tbR{right:-4px;bottom:0}
+  .tri-prog{position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:11px;color:var(--muted)}
+  .tri-reveal{flex:1;min-width:160px;border:1px solid var(--panel-line);border-radius:8px;padding:16px;background:rgba(255,255,255,.02);min-height:100px;display:flex;align-items:center}
+  .tri-hint{color:var(--muted);font-size:13px;text-align:center;width:100%}
+  .tri-formula{font-family:var(--display);font-weight:700;font-size:22px;color:var(--violet);margin-bottom:6px}
+  .tri-meaning{font-size:13px;line-height:1.5;color:var(--text);margin-bottom:6px}
+  .tri-analogy{font-size:12px;color:var(--muted);border-left:2px solid var(--panel-line);padding-left:8px}
+
+  /* panel accesibilidad */
+  .a11y-section{padding:20px 16px}
+  .a11y-toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+  .a11y-btn-ctrl{font-family:var(--display);font-size:12px;font-weight:600;padding:9px 14px;border-radius:7px;border:1px solid var(--panel-line);background:rgba(255,255,255,.03);color:var(--muted);cursor:pointer;transition:.2s}
+  .a11y-btn-ctrl.on{background:linear-gradient(135deg,var(--cyan),var(--violet));color:#04050a;border-color:transparent}
+  .a11y-size-row{display:flex;align-items:center;gap:6px;border:1px solid var(--panel-line);border-radius:7px;padding:4px 8px}
+  .a11y-size-row button{background:transparent;border:none;color:var(--cyan);font-weight:700;font-size:13px;cursor:pointer;padding:4px 6px}
+  .a11y-size-row span{font-family:var(--mono);font-size:11px;color:var(--muted);min-width:34px;text-align:center}
+  .a11y-preview{border:1px solid var(--panel-line);border-radius:8px;padding:18px;background:rgba(255,255,255,.02);transition:.25s}
+  .a11y-preview p{font-size:14px;line-height:1.7;color:#c7cce0;transition:.25s}
+  .a11y-preview.hc{background:#000;border-color:#fff}
+  .a11y-preview.hc p{color:#fff}
+  .a11y-preview.calm *{animation:none!important;transition:none!important}
+
+  /* checklist ERED-FUAC */
+  .ered-box{border:1px solid var(--panel-line);border-radius:10px;padding:18px 20px;margin-bottom:22px;background:rgba(124,92,255,.04)}
+  .ered-title{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--violet);margin-bottom:4px}
+  .ered-dim{font-family:var(--display);font-weight:700;font-size:15px;color:var(--cyan);margin-bottom:12px}
+  .ered-list{display:flex;flex-direction:column;gap:8px}
+  .ered-item{display:flex;align-items:flex-start;gap:9px;font-size:13.5px;color:#c7cce0;line-height:1.5}
+  .ered-check{flex-shrink:0;width:18px;height:18px;border-radius:4px;border:1px solid var(--green);color:var(--green);display:flex;align-items:center;justify-content:center;font-size:11px;margin-top:1px}
+
+  /* pregunta y dictámenes */
+  .q-label{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+  .q-text{font-family:var(--display);font-weight:600;font-size:16px;line-height:1.5;margin-bottom:16px;color:var(--text)}
+  .dict-label{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+  .dict-list{display:flex;flex-direction:column;gap:10px}
+  .dict-btn{
+    text-align:left;padding:15px 18px;border-radius:8px;border:1px solid var(--panel-line);
+    background:rgba(255,255,255,.02);color:var(--text);font-family:var(--body);font-size:14px;line-height:1.5;
+    cursor:pointer;transition:.15s;display:flex;gap:12px;align-items:flex-start;
+  }
+  .dict-btn:hover:not(:disabled){border-color:var(--violet);background:rgba(124,92,255,.06)}
+  .dict-btn .dict-ico{flex-shrink:0;font-size:15px;margin-top:1px}
+  .dict-btn:disabled{cursor:default}
+  .dict-btn.ok{border-color:var(--green);background:rgba(23,227,161,.08)}
+  .dict-btn.fail{border-color:var(--red);background:rgba(255,59,92,.07)}
+  .dict-btn.dim{opacity:.4}
+
+  /* análisis y resultado */
+  .analyzing{margin-top:18px;padding:18px 20px;border-radius:8px;border:1px solid var(--panel-line);background:rgba(124,92,255,.04);display:none;font-family:var(--mono);font-size:12px;color:var(--cyan)}
+  .analyzing.on{display:block}
+  .an-line{opacity:0;margin:4px 0}
+  .an-line.on{opacity:1}
+  .an-bar{height:4px;border-radius:3px;background:rgba(255,255,255,.07);overflow:hidden;margin:10px 0 4px}
+  .an-bar i{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--violet),var(--cyan));transition:width 1.1s linear}
+  .result-box{margin-top:16px;padding:18px 20px;border-radius:8px;border:1px solid var(--panel-line);display:none}
+  .result-box.on{display:block}
+  .result-box.ok{border-color:var(--green);background:rgba(23,227,161,.06)}
+  .result-box.fail{border-color:var(--red);background:rgba(255,59,92,.06)}
+  .result-title{font-family:var(--display);font-weight:700;font-size:14px;margin-bottom:8px}
+  .result-box.ok .result-title{color:var(--green)}
+  .result-box.fail .result-title{color:var(--red)}
+  .result-text{font-size:14px;line-height:1.65;color:#c7cce0}
+  .key-row{display:flex;align-items:center;gap:12px;margin-top:14px;padding:12px 16px;border-radius:8px;background:rgba(23,227,161,.07);border:1px solid rgba(23,227,161,.3)}
+  .key-row .k-ico{font-size:24px}
+  .key-row .k-txt{font-family:var(--mono);font-size:12px;color:var(--green)}
+  .result-actions{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap}
+
+  @media print{
+    body *{visibility:hidden}
+    #certBlock,#certBlock *{visibility:visible}
+    #certBlock{position:fixed;inset:0;margin:0;max-width:100%;border-radius:0;border:none;padding:40px 60px}
+  }
+
+  /* ========== SECUENCIA FINAL ANIMADA ========== */
+  .fase-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px}
+  .fase1-inner,.fase2-inner,.fase3-inner{max-width:720px;width:100%;text-align:center}
+
+  /* FASE 1: puertas */
+  .fase1-eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--violet);text-transform:uppercase;margin-bottom:10px}
+  .fase1-title{font-family:var(--display);font-weight:700;font-size:clamp(22px,4vw,30px);margin-bottom:8px}
+  .fase1-sub{color:var(--muted);font-size:14px;margin-bottom:36px}
+
+  .puertas-row{display:flex;justify-content:center;gap:24px;margin-bottom:32px;flex-wrap:wrap}
+  .puerta{
+    width:140px;height:200px;position:relative;perspective:600px;cursor:default;
+    border-radius:8px 8px 0 0;
+  }
+  .puerta-hoja{
+    position:absolute;top:0;width:50%;height:100%;
+    background:linear-gradient(160deg,#1a1f35,#0e1220);
+    border:1px solid var(--panel-line);
+    transition:transform .9s cubic-bezier(.4,0,.2,1);transform-origin:left center;
+    backface-visibility:hidden;
+  }
+  .puerta-hoja:first-child{left:0;border-radius:8px 0 0 0;transform-origin:left center}
+  .puerta-hoja:nth-child(2){right:0;border-radius:0 8px 0 0;transform-origin:right center}
+  .puerta.abierta .puerta-hoja:first-child{transform:rotateY(-110deg)}
+  .puerta.abierta .puerta-hoja:nth-child(2){transform:rotateY(110deg)}
+  .puerta-front{
+    position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:8px;border:1px solid var(--panel-line);border-radius:8px 8px 0 0;
+    background:linear-gradient(160deg,rgba(124,92,255,.08),rgba(35,213,245,.04));
+    transition:border-color .4s, box-shadow .4s;
+  }
+  .puerta.abierta .puerta-front{border-color:var(--green);box-shadow:0 0 30px rgba(23,227,161,.3)}
+  .puerta-icon{font-size:32px;transition:.4s}
+  .puerta.abierta .puerta-icon{filter:drop-shadow(0 0 10px var(--green))}
+  .puerta-num{font-family:var(--display);font-weight:700;font-size:22px;color:var(--violet)}
+  .puerta.abierta .puerta-num{color:var(--green)}
+  .puerta-lbl{font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:var(--muted);text-transform:uppercase}
+
+  .llaves-row{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+  .llave-chip{
+    display:flex;align-items:center;gap:8px;padding:12px 18px;border-radius:9px;
+    border:1px solid rgba(124,92,255,.4);background:rgba(124,92,255,.08);
+    font-family:var(--display);font-weight:600;font-size:14px;cursor:pointer;
+    transition:.2s ease;
+  }
+  .llave-chip:hover:not(.usada){border-color:var(--cyan);background:rgba(35,213,245,.1);transform:translateY(-2px)}
+  .llave-chip.usada{opacity:.4;cursor:not-allowed;text-decoration:line-through}
+  .llave-hint{font-family:var(--mono);font-size:12px;color:var(--muted)}
+
+  /* FASE 2: código */
+  .fase2-eye{font-size:52px;margin-bottom:18px;animation:bounce 1s ease infinite}
+  @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+  .fase2-title{font-family:var(--display);font-weight:700;font-size:clamp(20px,4vw,28px);color:var(--green);margin-bottom:8px}
+  .fase2-sub{color:var(--muted);font-size:14px;margin-bottom:28px}
+  .code-display{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:28px}
+  .code-digit{
+    width:72px;height:88px;border-radius:10px;border:2px solid var(--panel-line);
+    background:rgba(11,15,28,.7);font-family:var(--mono);font-weight:700;font-size:36px;
+    color:var(--cyan);display:flex;align-items:center;justify-content:center;
+    transition:.2s ease;
+  }
+  .code-digit.filled{border-color:var(--violet);box-shadow:0 0 16px rgba(124,92,255,.3)}
+  .code-digit.ok{border-color:var(--green);color:var(--green);box-shadow:0 0 20px rgba(23,227,161,.4)}
+  .code-digit.error{border-color:var(--red);color:var(--red);animation:shake .4s ease}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+  .code-sep{font-family:var(--mono);font-weight:700;font-size:28px;color:var(--muted)}
+  .code-keys{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:340px;margin:0 auto 16px}
+  .code-key{
+    padding:16px;border-radius:9px;border:1px solid var(--panel-line);
+    background:rgba(255,255,255,.03);color:var(--text);font-family:var(--mono);font-weight:700;font-size:18px;
+    cursor:pointer;transition:.15s ease;
+  }
+  .code-key:hover{border-color:var(--violet);background:rgba(124,92,255,.1)}
+  .code-key-del{color:var(--red);grid-column:span 2}
+  .code-key-ok{background:linear-gradient(135deg,var(--cyan),var(--violet));color:#04050a;border-color:transparent;grid-column:span 2}
+  .code-key-ok:disabled{opacity:.35;cursor:not-allowed;background:rgba(255,255,255,.08);color:var(--muted)}
+  .code-hint{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+
+  /* FASE 3: restaurado */
+  .repo-explosion{position:relative;width:110px;height:110px;margin:0 auto 24px;display:flex;align-items:center;justify-content:center}
+  .repo-ring{position:absolute;border-radius:50%;border:2px solid var(--green);opacity:0}
+  .repo-ring.r1{width:110px;height:110px;animation:ripple 1.8s .1s ease-out forwards infinite}
+  .repo-ring.r2{width:110px;height:110px;animation:ripple 1.8s .5s ease-out forwards infinite}
+  .repo-ring.r3{width:110px;height:110px;animation:ripple 1.8s .9s ease-out forwards infinite}
+  @keyframes ripple{0%{transform:scale(.6);opacity:.9}100%{transform:scale(2.2);opacity:0}}
+  .repo-icon{font-size:48px;position:relative;z-index:2;filter:drop-shadow(0 0 16px rgba(23,227,161,.7));animation:pop .5s ease}
+  @keyframes pop{0%{transform:scale(0)}70%{transform:scale(1.15)}100%{transform:scale(1)}}
+  .fase3-eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--green);text-transform:uppercase;margin-bottom:8px}
+  .fase3-title{font-family:var(--display);font-weight:700;font-size:clamp(24px,5vw,36px);margin-bottom:6px;
+    background:linear-gradient(90deg,#fff,var(--green) 55%,var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .fase3-sub{color:var(--muted);font-size:14px;margin-bottom:28px}
+
+  .final-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:26px;text-align:left}
+  @media(max-width:500px){.final-stats{grid-template-columns:1fr}}
+  .fstat{padding:16px 18px;border:1px solid var(--panel-line);border-radius:10px;background:rgba(11,15,28,.6)}
+  .fstat-lbl{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+  .fstat-val{font-family:var(--display);font-weight:700;font-size:18px;color:var(--text)}
+  .fstat-val.green{color:var(--green)}
+
+  .final-code-box{padding:20px;border:1px solid var(--violet);border-radius:10px;margin-bottom:24px;background:rgba(124,92,255,.06)}
+  .final-code-lbl{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--violet);text-transform:uppercase;margin-bottom:8px}
+  .final-code-val{font-family:var(--mono);font-weight:700;font-size:30px;letter-spacing:.2em;color:var(--cyan);text-shadow:0 0 20px rgba(35,213,245,.5)}
+  .keys-display{display:flex;justify-content:center;gap:10px;margin:10px 0 0}
+  .key-chip{font-size:20px;background:rgba(23,227,161,.1);border:1px solid rgba(23,227,161,.3);border-radius:8px;padding:6px 12px}
+
+  /* certificado */
+  /* ---- certificado institucional ---- */
+  #certBlock{margin:0 0 28px;position:relative;overflow:hidden;border:2px solid rgba(23,227,161,.5);border-radius:14px;background:linear-gradient(160deg,#05070f,#080c1a);padding:0;text-align:center}
+  #certBlock::before,#certBlock::after{content:'';position:absolute;width:50px;height:50px;border-color:var(--cyan);border-style:solid}
+  #certBlock::before{top:0;left:0;border-width:3px 0 0 3px;border-radius:14px 0 0 0}
+  #certBlock::after{bottom:0;right:0;border-width:0 3px 3px 0;border-radius:0 0 14px 0}
+  .cert-corner-tr,.cert-corner-bl{position:absolute;width:50px;height:50px;border-color:var(--cyan);border-style:solid}
+  .cert-corner-tr{top:0;right:0;border-width:3px 3px 0 0;border-radius:0 14px 0 0}
+  .cert-corner-bl{bottom:0;left:0;border-width:0 0 3px 3px;border-radius:0 0 0 14px}
+  .cert-header{background:linear-gradient(135deg,rgba(124,92,255,.25),rgba(35,213,245,.15));border-bottom:1px solid rgba(35,213,245,.2);padding:22px 30px 18px}
+  .cert-univ{font-family:var(--display);font-weight:700;font-size:14px;letter-spacing:.06em;color:#fff;text-transform:uppercase;margin-bottom:4px}
+  .cert-maestria{font-family:var(--mono);font-size:11px;color:rgba(35,213,245,.8);letter-spacing:.06em}
+  .cert-body{padding:28px 36px 0}
+  .cert-seal-row{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:20px}
+  .cert-seal-icon{font-size:36px;filter:drop-shadow(0 0 14px rgba(23,227,161,.6))}
+  .cert-type{font-family:var(--mono);font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--green);border:1px solid rgba(23,227,161,.3);border-radius:20px;padding:5px 14px}
+  .cert-certifica{font-size:13.5px;color:var(--muted);margin-bottom:10px}
+  .cert-names{font-family:var(--display);font-weight:700;font-size:clamp(20px,4vw,26px);color:#fff;line-height:1.3;margin-bottom:18px;text-shadow:0 0 30px rgba(35,213,245,.3)}
+  .cert-divider{height:1px;background:linear-gradient(90deg,transparent,rgba(35,213,245,.3),transparent);margin:0 auto 18px;max-width:320px}
+  .cert-desc{font-size:13.5px;color:#c7cce0;line-height:1.75;max-width:480px;margin:0 auto 16px}
+  .cert-recurso{display:inline-block;font-family:var(--display);font-weight:600;font-size:14px;color:var(--cyan);border:1px solid rgba(35,213,245,.25);border-radius:8px;padding:8px 20px;background:rgba(35,213,245,.06);margin-bottom:18px}
+  .cert-nivel{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--green);background:rgba(23,227,161,.1);border:1px solid rgba(23,227,161,.25);border-radius:20px;padding:7px 18px;margin-bottom:26px}
+  .cert-firmas{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid rgba(255,255,255,.08)}
+  .cert-firma{padding:18px 20px}
+  .cert-firma:first-child{border-right:1px solid rgba(255,255,255,.08)}
+  .cert-firma-line{height:1.5px;background:linear-gradient(90deg,transparent,var(--muted),transparent);margin:0 auto 8px;width:80%}
+  .cert-firma-name{font-family:var(--display);font-weight:700;font-size:12.5px;color:var(--text);margin-bottom:3px}
+  .cert-firma-rol{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.06em}
+  .cert-footer{background:rgba(255,255,255,.02);border-top:1px solid rgba(255,255,255,.06);padding:12px 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+  .cert-fecha{font-family:var(--mono);font-size:11px;color:var(--muted)}
+  .cert-id{font-family:var(--mono);font-size:10px;color:#3a3f55;letter-spacing:.04em}
+
+  .final-actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
+  .final-actions .btn{width:auto}
+
+  /* ---- reporte final ---- */
+  .reporte-box{border:1px solid var(--panel-line);border-radius:12px;padding:24px;margin-bottom:28px;background:rgba(11,15,28,.7);text-align:left}
+  .reporte-title{font-family:var(--display);font-weight:700;font-size:15px;color:var(--cyan);margin-bottom:16px;text-align:center}
+  .reporte-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+  @media(max-width:500px){.reporte-grid{grid-template-columns:1fr}}
+  .reporte-item{padding:14px 16px;border:1px solid var(--panel-line);border-radius:8px;background:rgba(255,255,255,.02)}
+  .reporte-lbl{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+  .reporte-val{font-family:var(--display);font-weight:700;font-size:17px;color:var(--text)}
+  .reporte-val.green{color:var(--green)}
+  .reporte-dim{grid-column:span 2;display:flex;flex-direction:column;gap:8px}
+  @media(max-width:500px){.reporte-dim{grid-column:span 1}}
+  .reporte-dim-item{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-radius:8px;border:1px solid var(--panel-line)}
+  .reporte-dim-item.ok{border-color:rgba(23,227,161,.3);background:rgba(23,227,161,.05)}
+  .reporte-dim-name{font-family:var(--display);font-weight:600;font-size:14px;color:var(--text)}
+  .reporte-dim-score{font-family:var(--mono);font-size:12px;color:var(--green);font-weight:700}
+  .reporte-footer{font-family:var(--mono);font-size:10.5px;color:var(--muted);text-align:center;margin-top:12px;line-height:1.5;border-top:1px solid var(--panel-line);padding-top:12px}
+
+  /* P12 — rol del evaluador */
+  .w-rol{font-family:var(--mono);font-size:12px;color:var(--green);background:rgba(23,227,161,.08);
+    border:1px solid rgba(23,227,161,.2);border-radius:20px;padding:6px 16px;
+    display:inline-block;margin-bottom:14px;letter-spacing:.03em}
+  .w-rol b{color:#fff}
+
+  /* P6 — tiempo y contador */
+  .hub-time{font-family:var(--mono);font-size:11px;color:var(--muted);
+    background:rgba(255,255,255,.04);border:1px solid var(--panel-line);
+    border-radius:20px;padding:5px 12px}
+  .exp-counter{font-family:var(--mono);font-size:11px;color:var(--violet);
+    background:rgba(124,92,255,.08);border:1px solid rgba(124,92,255,.2);
+    border-radius:20px;padding:5px 12px;margin-left:auto}
+
+  /* P13 — competencia en briefing */
+  .brief-competencia{font-family:var(--mono);font-size:12px;color:var(--green);
+    background:rgba(23,227,161,.07);border:1px solid rgba(23,227,161,.2);
+    border-radius:8px;padding:10px 16px;margin-bottom:16px;line-height:1.5}
+
+  /* P14 — objetivo del expediente */
+  .exp-objetivo{display:flex;align-items:flex-start;gap:10px;padding:12px 16px;
+    border-radius:8px;background:rgba(35,213,245,.06);border:1px solid rgba(35,213,245,.2);
+    margin-bottom:20px;font-size:13.5px;color:#c7cce0;line-height:1.5}
+  .obj-ico{font-size:16px;flex-shrink:0;margin-top:1px}
+
+  /* P7 — ayuda contextual */
+  .ered-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px;flex-wrap:wrap}
+  .ered-help-btn{font-family:var(--mono);font-size:11px;color:var(--violet);background:rgba(124,92,255,.08);
+    border:1px solid rgba(124,92,255,.25);border-radius:7px;padding:7px 12px;cursor:pointer;transition:.18s;white-space:nowrap}
+  .ered-help-btn:hover{background:rgba(124,92,255,.16);border-color:var(--violet)}
+  .ered-ayuda{background:rgba(124,92,255,.06);border:1px solid rgba(124,92,255,.2);
+    border-radius:8px;padding:14px 16px;margin-bottom:12px}
+  .ered-ayuda-title{font-family:var(--display);font-weight:700;font-size:14px;color:var(--violet);margin-bottom:6px}
+  .ered-ayuda-desc{font-size:13px;color:#c7cce0;line-height:1.65}
+
+  /* P1 — bloque de análisis previo */
+  .analisis-box{border:1px solid rgba(255,230,0,.2);border-radius:10px;
+    padding:18px 20px;margin-bottom:22px;background:rgba(255,230,0,.03)}
+  .analisis-title{font-family:var(--display);font-weight:700;font-size:14px;
+    color:#ffe600;margin-bottom:6px}
+  .analisis-sub{font-size:13px;color:var(--muted);margin-bottom:12px;line-height:1.5}
+  .analisis-items{display:flex;flex-direction:column;gap:7px}
+  .analisis-item{display:flex;align-items:center;gap:9px;font-size:13px;color:#c7cce0}
+  .analisis-ico{font-size:14px;flex-shrink:0}
+
+  /* P15 — reflexión */
+  .reflexion-box{font-family:var(--mono);font-size:12px;color:var(--muted);
+    background:rgba(255,255,255,.03);border:1px dashed var(--panel-line);
+    border-radius:7px;padding:10px 14px;margin-bottom:14px;line-height:1.5}
+
+  /* P9 — expediente cerrado */
+  .cerrado-card{max-width:560px;width:100%;text-align:center;
+    border:2px solid var(--green);border-radius:16px;padding:36px 28px;
+    background:radial-gradient(60% 50% at 50% 0%,rgba(23,227,161,.1),transparent),rgba(11,15,28,.9)}
+  .cerrado-icon{font-size:52px;margin-bottom:16px;filter:drop-shadow(0 0 20px rgba(23,227,161,.5))}
+  .cerrado-label{font-family:var(--mono);font-size:11px;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--green);margin-bottom:8px}
+  .cerrado-titulo{font-family:var(--display);font-weight:700;font-size:22px;
+    margin-bottom:20px;color:var(--text)}
+  .cerrado-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+  .cerrado-item{padding:14px;border:1px solid var(--panel-line);border-radius:8px;background:rgba(255,255,255,.03)}
+  .cerrado-full{grid-column:span 2}
+  .cerrado-lbl{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+  .cerrado-val{font-family:var(--display);font-weight:700;font-size:16px;color:var(--text)}
+  .cerrado-val.green{color:var(--green)}
+  .cerrado-llave{font-family:var(--display);font-weight:700;font-size:18px;color:#ffe600}
+  .cerrado-informe{text-align:left;border:1px solid var(--panel-line);border-radius:8px;padding:16px;background:rgba(255,255,255,.02);margin-top:6px}
+  .cerrado-informe-title{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--cyan);margin-bottom:8px}
+  .cerrado-informe-body{font-size:13px;color:#c7cce0;line-height:1.65}
+</style>
+</head>
+<body>
+
+<!-- ============ PANTALLA: BIENVENIDA + REGISTRO ============ -->
+<section id="welcome" class="screen active">
+  <div class="w-wrap">
+    <div class="w-seal">
+      <svg viewBox="0 0 132 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="66,8 116,37 116,95 66,124 16,95 16,37" stroke="url(#g1)" stroke-width="2.5" fill="rgba(124,92,255,.07)"/>
+        <path d="M66 50 L82 58 L82 76 L66 88 L50 76 L50 58 Z" fill="none" stroke="#fff" stroke-width="1.8" opacity=".9"/>
+        <circle cx="66" cy="70" r="4.5" fill="var(--cyan)"/>
+        <defs>
+          <linearGradient id="g1" x1="0" y1="0" x2="132" y2="132">
+            <stop offset="0" stop-color="#7c5cff"/><stop offset="1" stop-color="#23d5f5"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+    <h1 class="w-title">GUARDIANES<span class="dot">·</span>RED</h1>
+    <div class="w-eyebrow">Calidad Educativa Digital</div>
+    <div class="w-rol">👤 Rol asignado: <b>Evaluador de Recursos Educativos Digitales</b></div>
+    <p class="w-desc">El repositorio central de Recursos Educativos Digitales ha sido comprometido. Aplica el modelo ERED-FUAC y evalúa tres expedientes para restaurar el acceso.</p>
+
+    <div class="w-card">
+      <div class="w-card-head">
+        <span class="w-card-title">🛡️ Registro del Equipo Evaluador</span>
+        <span class="w-card-count" id="teamCount">1 integrante</span>
+      </div>
+      <span class="field-label">Nombre completo</span>
+      <div class="team-list" id="teamList">
+        <div class="team-row">
+          <input type="text" class="member-input" placeholder="Nombre completo del integrante 1" maxlength="50" oninput="checkTeam()">
+          <button class="rm-btn" onclick="removeMember(this)" disabled aria-label="Quitar integrante">✕</button>
+        </div>
+      </div>
+      <button class="add-member" onclick="addMember()">+ Agregar integrante</button>
+
+      <div class="w-actions">
+        <button class="btn" id="acceptBtn" onclick="acceptMission()">⚡ Aceptar Expediente</button>
+        <p class="w-error" id="wError"></p>
+      </div>
+      <p class="w-hint">Sus nombres aparecerán en el certificado final del protocolo.</p>
+    </div>
+
+    <p class="w-footer">Guardianes de la Calidad Educativa Digital · <b>Universidad de Cartagena</b> · Maestría en Recursos Digitales Aplicados a la Educación</p>
+  </div>
+</section>
+
+<!-- ============ PANTALLA: BRIEFING DEL RECURSO ============ -->
+<section id="briefing" class="screen">
+  <div class="brief-top">
+    <span class="brief-step">Paso 1 de 2 · Conoce el recurso a evaluar</span>
+  </div>
+  <div class="brief-body">
+    <div class="brief-competencia">🎯 Competencia a desarrollar: Aplicar criterios de evaluación de Recursos Educativos Digitales mediante el modelo ERED-FUAC.</div>
+    <div class="brief-eyebrow">Recurso Educativo Digital · Objeto de evaluación</div>
+    <h2 class="brief-title">Ohm-Vengers: La Resistencia del Conocimiento</h2>
+
+    <div class="brief-grid">
+      <div class="brief-info"><div class="brief-info-lbl">Tipo de recurso</div><div class="brief-info-val">Plataforma gamificada interactiva</div></div>
+      <div class="brief-info"><div class="brief-info-lbl">Área disciplinar</div><div class="brief-info-val">Tecnología · Física · Electricidad</div></div>
+      <div class="brief-info"><div class="brief-info-lbl">Nivel educativo</div><div class="brief-info-val">Educación media — Grado 10°</div></div>
+      <div class="brief-info"><div class="brief-info-lbl">Tecnología</div><div class="brief-info-val">HTML5 · CSS3 · JavaScript · Offline</div></div>
+      <div class="brief-info"><div class="brief-info-lbl">Modelo de evaluación</div><div class="brief-info-val">ERED-FUAC (Pertinencia · Calidad · Usabilidad)</div></div>
+      <div class="brief-info"><div class="brief-info-lbl">Autor</div><div class="brief-info-val">Carlos Mario Sanjuán Amador · Univ. de Cartagena</div></div>
+    </div>
+
+    <p class="brief-desc">
+      <strong>Ohm-Vengers</strong> es un recurso educativo digital gamificado diseñado para estudiantes de grado décimo. A través de una narrativa de misión, el estudiante aprende los conceptos fundamentales de la electricidad: <strong>voltaje, corriente y resistencia</strong>, la <strong>Ley de Ohm</strong>, la <strong>potencia eléctrica</strong> y el diseño de circuitos en serie y paralelo.<br><br>
+      El recurso integra <strong>simuladores interactivos</strong> (analogía agua-electricidad, triángulo de la Ley de Ohm, calculadoras, diseñador de circuitos residenciales), un <strong>sistema de progresión por rangos</strong>, evaluaciones con retroalimentación inmediata, un <strong>panel de accesibilidad</strong> alineado con el DUA y el Decreto 1421 de 2017, y un <strong>certificado final</strong> imprimible. Funciona completamente offline como archivo HTML único.<br><br>
+      Explóralo con atención — en los tres expedientes aplicarás los criterios de <strong>pertinencia, calidad y usabilidad</strong> del modelo ERED-FUAC sobre componentes específicos de este recurso.
+    </p>
+
+    <div class="brief-frame-wrap">
+      <div class="brief-frame-bar">
+        <div class="brief-frame-lbl"><span class="brief-frame-dot"></span>RECURSO A EVALUAR · Ohm-Vengers</div>
+      </div>
+
+      <!-- opción de acceso -->
+      <div id="briefAccessCard" class="brief-access-card">
+        <div class="brief-access-icon">🎮</div>
+        <div class="brief-access-title">Ohm-Vengers: La Resistencia del Conocimiento</div>
+        <div class="brief-access-sub">Explora el recurso antes de comenzar los expedientes de evaluación</div>
+        <div class="brief-access-btns">
+          <button class="brief-btn-explore" onclick="cargarIframe()">▶ Explorar aquí</button>
+          <a class="brief-btn-tab" href="https://carlossanjuan2025.github.io/ohm-vengers-electricidad/" target="_blank" rel="noopener">↗ Abrir en nueva pestaña</a>
+        </div>
+        <div class="brief-access-note">💡 "Explorar aquí" requiere conexión a internet · "Nueva pestaña" también</div>
+      </div>
+
+      <!-- iframe (oculto hasta que el usuario lo pida) -->
+      <div id="briefIframeWrap" style="display:none">
+        <iframe id="briefIframe" src="" title="Ohm-Vengers" allow="autoplay" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+        <div class="brief-frame-note" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+          <span>Ohm-Vengers corriendo en vivo · requiere internet</span>
+          <button style="background:transparent;border:1px solid var(--panel-line);border-radius:5px;color:var(--muted);font-size:12px;padding:4px 10px;cursor:pointer" onclick="cerrarIframe()">✕ Cerrar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="brief-actions">
+      <button class="btn-ghost" onclick="show('welcome')">← Volver</button>
+      <button class="btn" onclick="show('hub'); renderHub();">Continuar a los Expedientes →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CENTRO DE OPERACIONES ============ -->
+<section id="hub" class="screen">
+  <div class="hub-topbar">
+    <span class="hub-brand">GUARDIANES · RED</span>
+    <span class="hub-time">⏱ ~15 min</span>
+    <span class="hub-team" id="hubTeam">—</span>
+    <div class="hub-progress">
+      <div class="hub-bar"><i id="hubBar"></i></div>
+      <span class="hub-pct" id="hubPct">0%</span>
+    </div>
+    <div class="hub-keys">
+      <span class="hub-keys-lbl">LLAVES</span>
+      <div class="hub-key" id="key1">🔑</div>
+      <div class="hub-key" id="key2">🔑</div>
+      <div class="hub-key" id="key3">🔑</div>
+    </div>
+  </div>
+
+  <div class="hub-body">
+    <div class="hub-head">
+      <h1 class="hub-title" id="hubTitle">Centro de Operaciones</h1>
+      <p class="hub-sub">Selecciona un expediente activo para comenzar la evaluación. Aplica el modelo ERED-FUAC.</p>
+    </div>
+
+    <div class="exp-grid">
+      <div class="exp-card" id="cardExp1" onclick="openExp(1)">
+        <div class="exp-num">EXPEDIENTE RED-001</div>
+        <div class="exp-icon">🚪</div>
+        <div class="exp-name">La Puerta de la Pertinencia</div>
+        <div class="exp-desc">¿El recurso responde al tema y objetivo de aprendizaje declarados?</div>
+        <span class="exp-badge pending" id="badgeExp1">● Disponible</span>
+      </div>
+
+      <div class="exp-card locked" id="cardExp2" onclick="openExp(2)">
+        <div class="exp-num">EXPEDIENTE RED-002</div>
+        <div class="exp-icon">🧪</div>
+        <div class="exp-name">El Laboratorio de la Calidad</div>
+        <div class="exp-desc">¿El contenido es técnicamente correcto y pedagógicamente sólido?</div>
+        <span class="exp-badge locked" id="badgeExp2">🔒 Bloqueado</span>
+      </div>
+
+      <div class="exp-card locked" id="cardExp3" onclick="openExp(3)">
+        <div class="exp-num">EXPEDIENTE RED-003</div>
+        <div class="exp-icon">🎛️</div>
+        <div class="exp-name">La Cámara de la Usabilidad</div>
+        <div class="exp-desc">¿El recurso es fácil e intuitivo de usar para el estudiante?</div>
+        <span class="exp-badge locked" id="badgeExp3">🔒 Bloqueado</span>
+      </div>
+    </div>
+
+    <div class="hub-footer">
+      <button class="btn-ghost" onclick="show('briefing')">← Ver recurso evaluado</button>
+      <button class="btn-ghost" onclick="if(confirm('¿Reiniciar todo el progreso?')){resetAll()}">↺ Reiniciar progreso</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PANTALLA DE EXPEDIENTE ============ -->
+<section id="expediente" class="screen">
+  <div class="exp-topbar">
+    <button class="exp-back" onclick="salirExpediente()">← Volver al Centro de Operaciones</button>
+    <span class="exp-crumb" id="expCrumb">Expediente <b>RED-001</b></span>
+    <span class="exp-counter" id="expCounter">Expediente 1 de 3 · ⏱ ~5 min</span>
+  </div>
+  <div class="exp-body">
+    <div class="exp-eyebrow" id="expEyebrow">Modelo ERED-FUAC · Dimensión: Pertinencia</div>
+    <h2 class="exp-title" id="expTitle">La Puerta de la Pertinencia</h2>
+
+    <!-- objetivo del expediente (P14) -->
+    <div class="exp-objetivo" id="expObjetivo">
+      <span class="obj-ico">🎯</span>
+      <span id="expObjetivoTxt">—</span>
+    </div>
+
+    <!-- tarjeta del recurso -->
+    <div class="rec-card">
+      <div class="rec-name" id="recName">—</div>
+      <div class="rec-tags" id="recTags"></div>
+      <p class="rec-desc" id="recDesc">—</p>
+      <div class="sim-wrap"><div class="sim-bar"><span class="sim-dot"></span><span class="sim-lbl">RECURSO EN VIVO · INTERACTÚA ANTES DE RESPONDER</span></div><div id="simSlot"></div></div>
+    </div>
+
+    <!-- checklist ERED-FUAC + botón de ayuda (P3 + P7) -->
+    <div class="ered-box">
+      <div class="ered-header">
+        <div>
+          <div class="ered-title">Modelo de evaluación activo · ERED-FUAC v1.0</div>
+          <div class="ered-dim" id="eredDim">Dimensión evaluada: PERTINENCIA</div>
+        </div>
+        <button class="ered-help-btn" id="eredHelpBtn" onclick="toggleAyuda()">❓ ¿Qué evalúa esta dimensión?</button>
+      </div>
+      <!-- ayuda contextual (P7) -->
+      <div class="ered-ayuda" id="eredAyuda" style="display:none">
+        <div class="ered-ayuda-title" id="ayudaTitle">—</div>
+        <p class="ered-ayuda-desc" id="ayudaDesc">—</p>
+      </div>
+      <div class="ered-list" id="eredList"></div>
+    </div>
+
+    <!-- bloque de análisis previo (P1) -->
+    <div class="analisis-box">
+      <div class="analisis-title">🔍 Análisis del Evaluador</div>
+      <p class="analisis-sub">Antes de emitir el dictamen, observa el recurso considerando los siguientes aspectos del modelo ERED-FUAC:</p>
+      <div class="analisis-items" id="analisisItems"></div>
+    </div>
+
+    <!-- pregunta + reflexión (P15) -->
+    <div class="q-label">Pregunta de evaluación</div>
+    <p class="q-text" id="qText">—</p>
+    <div class="reflexion-box">💭 <em>¿En qué evidencia del recurso fundamenta su decisión?</em></div>
+    <div class="dict-label">Selecciona el dictamen correcto:</div>
+    <div class="dict-list" id="dictList"></div>
+
+    <!-- secuencia de análisis -->
+    <div class="analyzing" id="analyzing">
+      <div class="an-line" id="anL1">▶ Registrando dictamen del evaluador...</div>
+      <div class="an-line" id="anL2">▶ Aplicando modelo ERED-FUAC...</div>
+      <div class="an-line" id="anL3">▶ Verificando criterios de la matriz...</div>
+      <div class="an-bar"><i id="anBar"></i></div>
+    </div>
+
+    <!-- resultado -->
+    <div class="result-box" id="resultBox">
+      <div class="result-title" id="resultTitle">—</div>
+      <p class="result-text" id="resultText">—</p>
+      <div class="key-row" id="keyRow" style="display:none">
+        <span class="k-ico">🔑</span>
+        <span class="k-txt" id="keyTxt">—</span>
+      </div>
+      <div class="result-actions" id="resultActions"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PANTALLA FINAL ANIMADA ============ -->
+<section id="final" class="screen">
+
+  <!-- FASE 1: Puertas -->
+  <div id="fase1" class="fase-wrap">
+    <div class="fase1-inner">
+      <div class="fase1-eyebrow">Repositorio comprometido · Protocolo de restauración</div>
+      <h2 class="fase1-title">Las 3 Puertas del Repositorio</h2>
+      <p class="fase1-sub">Usa cada llave para abrir la puerta correspondiente</p>
+      <div class="puertas-row" id="puertasRow">
+        <div class="puerta" id="puerta1">
+          <div class="puerta-hoja" id="hoja1L"></div>
+          <div class="puerta-hoja" id="hoja1R"></div>
+          <div class="puerta-front" id="front1">
+            <div class="puerta-icon">🔒</div>
+            <div class="puerta-num">I</div>
+            <div class="puerta-lbl">Pertinencia</div>
+          </div>
+        </div>
+        <div class="puerta" id="puerta2">
+          <div class="puerta-hoja" id="hoja2L"></div>
+          <div class="puerta-hoja" id="hoja2R"></div>
+          <div class="puerta-front" id="front2">
+            <div class="puerta-icon">🔒</div>
+            <div class="puerta-num">II</div>
+            <div class="puerta-lbl">Calidad</div>
+          </div>
+        </div>
+        <div class="puerta" id="puerta3">
+          <div class="puerta-hoja" id="hoja3L"></div>
+          <div class="puerta-hoja" id="hoja3R"></div>
+          <div class="puerta-front" id="front3">
+            <div class="puerta-icon">🔒</div>
+            <div class="puerta-num">III</div>
+            <div class="puerta-lbl">Usabilidad</div>
+          </div>
+        </div>
+      </div>
+      <div class="llaves-row">
+        <div class="llave-chip" id="llave1" onclick="usarLlave(1)">🔑 <span>Llave de Pertinencia — cód. 3</span></div>
+        <div class="llave-chip" id="llave2" onclick="usarLlave(2)">🔑 <span>Llave de Calidad — cód. 5</span></div>
+        <div class="llave-chip" id="llave3" onclick="usarLlave(3)">🔑 <span>Llave de Usabilidad — cód. 7</span></div>
+      </div>
+      <div class="llave-hint" id="llaveHint">Haz clic en cada llave para abrir la puerta</div>
+    </div>
+  </div>
+
+  <!-- FASE 2: Ingresar código -->
+  <div id="fase2" class="fase-wrap" style="display:none">
+    <div class="fase2-inner">
+      <div class="fase2-eye">🔓</div>
+      <h2 class="fase2-title">¡Las 3 puertas están abiertas!</h2>
+      <p class="fase2-sub">Ingresa el código maestro para restaurar el repositorio</p>
+      <div class="code-display">
+        <div class="code-digit" id="cd1">_</div>
+        <div class="code-sep">·</div>
+        <div class="code-digit" id="cd2">_</div>
+        <div class="code-sep">·</div>
+        <div class="code-digit" id="cd3">_</div>
+      </div>
+      <div class="code-keys">
+        <button class="code-key" onclick="ingresarDigito('4')">4</button>
+        <button class="code-key" onclick="ingresarDigito('9')">9</button>
+        <button class="code-key" onclick="ingresarDigito('2')">2</button>
+        <button class="code-key" onclick="ingresarDigito('5')">5</button>
+        <button class="code-key" onclick="ingresarDigito('7')">7</button>
+        <button class="code-key" onclick="ingresarDigito('3')">3</button>
+        <button class="code-key code-key-del" onclick="borrarDigito()">⌫</button>
+        <button class="code-key code-key-ok" id="btnActivar" onclick="activarRepositorio()" disabled>ACTIVAR</button>
+      </div>
+      <div class="code-hint" id="codeHint">El código está formado por los 3 dígitos obtenidos en cada expediente</div>
+    </div>
+  </div>
+
+  <!-- FASE 3: Repositorio restaurado + certificado -->
+  <div id="fase3" class="fase-wrap" style="display:none">
+    <div class="fase3-inner">
+      <div class="repo-explosion" id="repoExplosion">
+        <div class="repo-ring r1"></div>
+        <div class="repo-ring r2"></div>
+        <div class="repo-ring r3"></div>
+        <div class="repo-icon">🗄️</div>
+      </div>
+      <div class="fase3-eyebrow">Protocolo completado · Modelo ERED-FUAC</div>
+      <h1 class="fase3-title">¡Repositorio Restaurado!</h1>
+      <p class="fase3-sub">Has aplicado satisfactoriamente el modelo ERED-FUAC para evaluar Recursos Educativos Digitales.<br>Gracias por contribuir a la calidad educativa digital.</p>
+
+      <!-- REPORTE FINAL -->
+      <div class="reporte-box">
+        <div class="reporte-title">📊 Reporte General de Evaluación</div>
+        <div class="reporte-grid">
+          <div class="reporte-item">
+            <div class="reporte-lbl">Expedientes analizados</div>
+            <div class="reporte-val green">3 / 3</div>
+          </div>
+          <div class="reporte-item">
+            <div class="reporte-lbl">Modelo aplicado</div>
+            <div class="reporte-val">ERED-FUAC</div>
+          </div>
+          <div class="reporte-dim">
+            <div class="reporte-dim-item ok">
+              <span class="reporte-dim-name">🚪 Pertinencia</span>
+              <span class="reporte-dim-score">VALIDADO ✓</span>
+            </div>
+            <div class="reporte-dim-item ok">
+              <span class="reporte-dim-name">🧪 Calidad</span>
+              <span class="reporte-dim-score">VALIDADO ✓</span>
+            </div>
+            <div class="reporte-dim-item ok">
+              <span class="reporte-dim-name">🎛️ Usabilidad</span>
+              <span class="reporte-dim-score">VALIDADO ✓</span>
+            </div>
+          </div>
+          <div class="reporte-item">
+            <div class="reporte-lbl">Estado del repositorio</div>
+            <div class="reporte-val green">🔓 Restaurado</div>
+          </div>
+        </div>
+        <div class="reporte-footer">Todos los expedientes fueron evaluados aplicando el modelo ERED-FUAC, fundamentado en los estándares UNE 71362, LORI y COdA.</div>
+      </div>
+
+      <!-- CERTIFICADO INSTITUCIONAL -->
+      <div id="certBlock">
+        <span class="cert-corner-tr"></span><span class="cert-corner-bl"></span>
+        <div class="cert-header">
+          <div class="cert-univ">Universidad de Cartagena</div>
+          <div class="cert-maestria">Maestría en Recursos Digitales Aplicados a la Educación · Gestión de Recursos Educativos Digitales</div>
+        </div>
+        <div class="cert-body">
+          <div class="cert-seal-row">
+            <span class="cert-seal-icon">🛡️</span>
+            <span class="cert-type">Certificado de Evaluación</span>
+          </div>
+          <p class="cert-certifica">Se certifica que</p>
+          <div class="cert-names" id="certNames">—</div>
+          <div class="cert-divider"></div>
+          <p class="cert-desc">aplicó satisfactoriamente el modelo <strong>ERED-FUAC</strong> para evaluar el Recurso Educativo Digital</p>
+          <div class="cert-recurso">Ohm-Vengers: La Resistencia del Conocimiento</div>
+          <p class="cert-desc">evaluando las dimensiones de <strong>pertinencia, calidad y usabilidad</strong>, emitiendo dictámenes fundamentados que permitieron restaurar el Repositorio Central de Recursos Educativos Digitales.</p>
+          <div class="cert-nivel">🏅 Nivel alcanzado: Guardián Certificado</div>
+        </div>
+        <div class="cert-firmas">
+          <div class="cert-firma">
+            <div class="cert-firma-line"></div>
+            <div class="cert-firma-name">Sistema Guardianes RED</div>
+            <div class="cert-firma-rol">Plataforma de Evaluación de RED</div>
+          </div>
+          <div class="cert-firma">
+            <div class="cert-firma-line"></div>
+            <div class="cert-firma-name">Modelo ERED-FUAC v1.0</div>
+            <div class="cert-firma-rol">Instrumento de Evaluación Aplicado</div>
+          </div>
+        </div>
+        <div class="cert-footer">
+          <span class="cert-fecha" id="certMeta">—</span>
+          <span class="cert-id">Basado en UNE 71362 · LORI · COdA · ERED-FUAC</span>
+        </div>
+      </div>
+
+      <div class="final-actions">
+        <button class="btn-ghost" onclick="if(confirm('¿Reiniciar?')){resetAll();show('welcome');}">↺ Nuevo protocolo</button>
+        <button class="btn" onclick="window.print()">⬇ Descargar certificado</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ EXPEDIENTE CERRADO (P9) ============ -->
+<section id="expCerrado" class="screen">
+  <div class="fase-wrap">
+    <div class="cerrado-card">
+      <div class="cerrado-icon">📁</div>
+      <div class="cerrado-label">EXPEDIENTE CERRADO</div>
+      <h2 class="cerrado-titulo" id="cerradoTitulo">—</h2>
+      <div class="cerrado-grid">
+        <div class="cerrado-item"><div class="cerrado-lbl">Dimensión</div><div class="cerrado-val" id="cerradoDim">—</div></div>
+        <div class="cerrado-item"><div class="cerrado-lbl">Resultado</div><div class="cerrado-val green">VALIDADO ✓</div></div>
+        <div class="cerrado-item cerrado-full"><div class="cerrado-lbl">Llave obtenida</div><div class="cerrado-llave" id="cerradoLlave">—</div></div>
+      </div>
+      <!-- mini informe P16 -->
+      <div class="cerrado-informe">
+        <div class="cerrado-informe-title">📋 Dictamen Emitido</div>
+        <div class="cerrado-informe-body" id="cerradoInforme">—</div>
+      </div>
+      <button class="btn" style="width:auto;margin-top:20px" onclick="show('hub');renderHub()">Volver al Centro de Operaciones →</button>
+    </div>
+  </div>
+</section>
+
+<script>
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const el = document.getElementById(id);
+  if(el){ el.classList.add('active'); el.scrollTop=0; }
+}
+
+/* ---------------- equipo de guardianes ---------------- */
+let teamData = [];
+
+function addMember(){
+  const list = document.getElementById('teamList');
+  const n = list.children.length + 1;
+  const row = document.createElement('div');
+  row.className = 'team-row';
+  row.innerHTML = `
+    <input type="text" class="member-input" placeholder="Nombre completo del integrante ${n}" maxlength="50" oninput="checkTeam()">
+    <button class="rm-btn" onclick="removeMember(this)" aria-label="Quitar integrante">✕</button>`;
+  list.appendChild(row);
+  updateTeamCount();
+  renumberPlaceholders();
+  row.querySelector('input').focus();
+}
+function removeMember(btn){
+  const list = document.getElementById('teamList');
+  if(list.children.length <= 1) return;
+  btn.closest('.team-row').remove();
+  updateTeamCount();
+  renumberPlaceholders();
+  checkTeam();
+}
+function renumberPlaceholders(){
+  document.querySelectorAll('#teamList .member-input').forEach((inp,i)=>{
+    inp.placeholder = `Nombre completo del integrante ${i+1}`;
+  });
+  const rows = document.querySelectorAll('#teamList .team-row');
+  rows.forEach(r=>{ r.querySelector('.rm-btn').disabled = (rows.length<=1); });
+}
+function updateTeamCount(){
+  const n = document.getElementById('teamList').children.length;
+  document.getElementById('teamCount').textContent = n + (n===1?' integrante':' integrantes');
+}
+function checkTeam(){
+  const names = [...document.querySelectorAll('.member-input')].map(i=>i.value.trim()).filter(Boolean);
+  document.getElementById('acceptBtn').disabled = names.length===0;
+}
+let unlocked = 1;
+let completed = 0;
+
+function renderHub(){
+  // equipo
+  const t = document.getElementById('hubTeam');
+  if(teamData.length===1) t.textContent = teamData[0];
+  else if(teamData.length>1) t.textContent = teamData.length+' agentes asignados';
+
+  // saludo
+  const title = document.getElementById('hubTitle');
+  if(teamData.length===1) title.textContent = 'Bienvenido, Agente '+teamData[0].split(' ')[0];
+  else title.textContent = 'Centro de Operaciones';
+
+  // barra de progreso
+  const pct = Math.round((completed/3)*100);
+  document.getElementById('hubBar').style.width = pct+'%';
+  document.getElementById('hubPct').textContent = pct+'%';
+
+  // llaves
+  for(let i=1;i<=3;i++){
+    document.getElementById('key'+i).classList.toggle('filled', i<=completed);
+  }
+
+  // tarjetas
+  for(let i=1;i<=3;i++){
+    const card = document.getElementById('cardExp'+i);
+    const badge = document.getElementById('badgeExp'+i);
+    const isDone = i<=completed;
+    const isOpen = i<=unlocked;
+    card.classList.toggle('locked', !isOpen);
+    card.classList.toggle('done', isDone);
+    if(isDone){
+      badge.className='exp-badge done'; badge.textContent='✓ Completado';
+    } else if(isOpen){
+      badge.className='exp-badge pending'; badge.textContent='● Disponible';
+    } else {
+      badge.className='exp-badge locked'; badge.textContent='🔒 Bloqueado';
+    }
+  }
+
+  // botón de restaurar si completo
+  const footer = document.querySelector('.hub-footer');
+  if(completed>=3){
+    footer.innerHTML = `
+      <div class="celebrate-card">
+        <div class="celeb-keys">
+          <span class="celeb-key">🔑</span>
+          <span class="celeb-key">🔑</span>
+          <span class="celeb-key">🔑</span>
+        </div>
+        <div class="celeb-title">¡Las 3 llaves han sido obtenidas!</div>
+        <div class="celeb-sub">Has evaluado correctamente los tres expedientes con el modelo ERED-FUAC.<br>El repositorio está listo para ser restaurado.</div>
+        <button class="celeb-btn" onclick="goFinal()">🔓 RESTAURAR REPOSITORIO</button>
+        <div class="celeb-code">Código maestro: 3 · 5 · 7 — listo para ingresar</div>
+      </div>`;
+  } else {
+    footer.innerHTML = `
+      <button class="btn-ghost" onclick="show('briefing')">← Ver recurso evaluado</button>
+      <button class="btn-ghost" onclick="if(confirm('¿Reiniciar todo el progreso?')){resetAll()}">↺ Reiniciar progreso</button>`;
+  }
+}
+
+/* ==================== MOTOR DE EXPEDIENTES ==================== */
+let simRAF = null;
+let triSet = new Set();
+let a11ySize = 0;
+const a11ySizes = [14,16,18.5,21];
+let currentExp = null;
+
+/* ---- datos de los 3 expedientes ---- */
+const expedientes = {
+  1:{
+    num:'RED-001', titulo:'La Puerta de la Pertinencia',
+    criterio:'Pertinencia', dimension:'PERTINENCIA',
+    objetivo:'Determinar si el recurso educativo digital responde al tema, objetivos y nivel educativo declarados.',
+    ayuda:{titulo:'Pertinencia',desc:'Evalúa la relación entre el contenido del recurso, el objetivo de aprendizaje declarado, el contexto educativo y el público al que va dirigido. Un recurso es pertinente cuando su contenido corresponde exactamente con lo que promete enseñar, al nivel adecuado.'},
+    analisis:['Verifica si el contenido aborda el tema declarado (voltaje, corriente, resistencia)','Observa si la estrategia didáctica es coherente con el nivel de grado décimo','Comprueba si los objetivos de aprendizaje son coherentes con las actividades presentadas'],
+    recurso:{
+      nombre:'Ohm-Vengers: Sesión 1 — Analogía Agua-Electricidad',
+      tags:['Grado 10°','Electricidad','Simulador Canvas','Analogía interactiva'],
+      desc:'La Sesión 1 de Ohm-Vengers introduce voltaje, corriente y resistencia mediante una analogía con un sistema de tuberías de agua. El slider controla la presión (voltaje); observa cómo cambia el flujo y el brillo del bombillo.'
+    },
+    checklist:[
+      'Relación directa entre el contenido y el tema declarado del recurso',
+      'Coherencia con el objetivo de aprendizaje planteado',
+      'Adecuación al nivel educativo del público (grado décimo)'
+    ],
+    pregunta:'Considerando el objetivo pedagógico declarado (enseñar voltaje, corriente y resistencia a grado 10°), ¿cómo evalúas la pertinencia de este componente?',
+    opciones:[
+      {t:'Alta pertinencia: el contenido aborda exactamente voltaje, corriente y resistencia, coherente con el objetivo y adecuado para grado décimo usando una analogía visual accesible.', ok:true},
+      {t:'Baja pertinencia: una analogía con agua no tiene rigor técnico suficiente para un curso de electrónica.', ok:false},
+      {t:'No es posible evaluar pertinencia sin conocer las calificaciones previas del estudiante.', ok:false},
+      {t:'Pertinencia media: solo sería pertinente si el estudiante ya conoce la Ley de Ohm.', ok:false}
+    ],
+    feedOk:'✅ DICTAMEN VALIDADO — Justificación pedagógica: El recurso evidencia alta pertinencia según el modelo ERED-FUAC porque: (1) Los objetivos declarados corresponden exactamente al contenido presentado — voltaje, corriente y resistencia. (2) La estrategia didáctica (analogía agua-electricidad) es coherente con el nivel cognitivo de grado décimo. (3) El contenido está directamente alineado con el currículo de Tecnología e Informática para educación media. Por tanto, cumple los indicadores de pertinencia del modelo ERED-FUAC.',
+    feedFail:'⚠ DICTAMEN NO VALIDADO — El dictamen emitido no coincide con los indicadores del modelo ERED-FUAC para la dimensión de Pertinencia. Recuerde que la pertinencia evalúa si el contenido responde al tema declarado, si los objetivos son coherentes con el nivel educativo del público, y si la estrategia es adecuada para el contexto. Revise nuevamente el recurso considerando estos indicadores e intente de nuevo.',
+    codigo:'3'
+  },
+  2:{
+    num:'RED-002', titulo:'El Laboratorio de la Calidad',
+    criterio:'Calidad', dimension:'CALIDAD',
+    objetivo:'Analizar la exactitud técnica, la fundamentación conceptual y la coherencia pedagógica del recurso.',
+    ayuda:{titulo:'Calidad',desc:'Evalúa si el contenido es técnicamente correcto, está bien fundamentado conceptualmente y es coherente con el resto del recurso. Incluye la precisión de la información, la ausencia de errores y la solidez de los fundamentos pedagógicos.'},
+    analisis:['Verifica la exactitud matemática de las tres fórmulas presentadas (V=I×R, I=V÷R, R=V÷I)','Observa si existe coherencia con la analogía del agua introducida en la Sesión 1','Comprueba si el contenido está libre de errores técnicos o imprecisiones conceptuales'],
+    recurso:{
+      nombre:'Ohm-Vengers: Sesión 2 — Triángulo de la Ley de Ohm',
+      tags:['Grado 10°','Ley de Ohm','Interactivo','V = I × R'],
+      desc:'Este componente presenta el triángulo interactivo de la Ley de Ohm. Toca cada letra (V, I, R) para ver su fórmula de despeje, su significado y el equivalente en la analogía del agua. Interactúa con las 3 letras antes de responder.'
+    },
+    checklist:[
+      'Exactitud técnica y matemática del contenido presentado',
+      'Fundamentación conceptual sólida, sin errores',
+      'Coherencia con el resto del recurso (misma analogía y lenguaje)'
+    ],
+    pregunta:'Después de interactuar con el triángulo, ¿cómo evalúas la calidad técnica y pedagógica de este componente de Ohm-Vengers?',
+    opciones:[
+      {t:'Baja calidad: presenta solo tres fórmulas sin ejercicios adicionales en este paso.', ok:false},
+      {t:'Alta calidad: las tres fórmulas son matemáticamente correctas, coherentes entre sí y retoman la analogía del agua de la Sesión 1, reforzando el aprendizaje.', ok:true},
+      {t:'Calidad no evaluable: el diseño con colores llamativos distrae del contenido técnico.', ok:false},
+      {t:'Calidad media: el triángulo es solo un elemento decorativo sin valor didáctico.', ok:false}
+    ],
+    feedOk:'✅ DICTAMEN VALIDADO — Justificación pedagógica: El recurso evidencia alta calidad según el modelo ERED-FUAC porque: (1) Las tres fórmulas (V=I×R, I=V÷R, R=V÷I) son matemáticamente correctas y equivalentes entre sí. (2) El contenido está bien fundamentado conceptualmente, sin errores ni imprecisiones técnicas. (3) Existe coherencia interna con la Sesión 1, retomando la analogía del agua para facilitar la transferencia del aprendizaje. Por tanto, cumple los indicadores de calidad del modelo ERED-FUAC.',
+    feedFail:'⚠ DICTAMEN NO VALIDADO — El dictamen emitido no coincide con los indicadores del modelo ERED-FUAC para la dimensión de Calidad. Recuerde que la calidad evalúa la exactitud técnica del contenido, la solidez de la fundamentación conceptual y la coherencia con el resto del recurso. No se trata del diseño visual ni de la cantidad de actividades. Revise nuevamente los indicadores e intente de nuevo.',
+    codigo:'5'
+  },
+  3:{
+    num:'RED-003', titulo:'La Cámara de la Usabilidad',
+    criterio:'Usabilidad', dimension:'USABILIDAD',
+    objetivo:'Evaluar qué tan fácil, intuitivo y accesible resulta el uso del recurso para el estudiante.',
+    ayuda:{titulo:'Usabilidad',desc:'Evalúa si el usuario puede interactuar con el recurso de forma fácil e intuitiva, si recibe retroalimentación inmediata ante sus acciones, si las instrucciones son claras y si no se requiere conocimiento técnico previo para usarlo.'},
+    analisis:['Prueba cada control del panel y observa si produce efecto inmediato y visible','Verifica si las etiquetas de cada función son claras y comprensibles','Comprueba si cualquier estudiante podría usarlo sin instrucciones adicionales'],
+    recurso:{
+      nombre:'Ohm-Vengers: Panel de Accesibilidad y Usabilidad',
+      tags:['DUA','Decreto 1421','Accesibilidad','Narración por voz'],
+      desc:'Ohm-Vengers incluye un panel de accesibilidad completo. Prueba los controles: alto contraste, tamaño de texto y narración por voz. Observa si son intuitivos y si producen retroalimentación inmediata antes de emitir tu dictamen.'
+    },
+    checklist:[
+      'Facilidad de navegación e interacción con los controles',
+      'Claridad de las etiquetas e instrucciones de cada función',
+      'Retroalimentación inmediata ante cada acción del usuario'
+    ],
+    pregunta:'Después de usar los controles del panel de accesibilidad, ¿cómo evalúas la usabilidad de este componente?',
+    opciones:[
+      {t:'Alta usabilidad: cada control aplica su efecto de forma inmediata y visible, las etiquetas son claras y no requiere conocimiento técnico previo.', ok:true},
+      {t:'Baja usabilidad: tiene demasiadas opciones, lo que genera confusión en el estudiante.', ok:false},
+      {t:'La usabilidad solo puede evaluarse si el panel funciona exclusivamente con teclado.', ok:false},
+      {t:'No es posible evaluar usabilidad sin revisar el código fuente del recurso.', ok:false}
+    ],
+    feedOk:'✅ DICTAMEN VALIDADO — Justificación pedagógica: El recurso evidencia alta usabilidad según el modelo ERED-FUAC porque: (1) Cada control produce retroalimentación inmediata y visible: el texto cambia de tamaño, el contraste se activa, la narración comienza. (2) Las etiquetas describen con claridad la función de cada opción, sin ambigüedades. (3) No se requiere conocimiento técnico previo para interactuar con el panel, cumpliendo el principio de accesibilidad del DUA. Por tanto, cumple los indicadores de usabilidad del modelo ERED-FUAC.',
+    feedFail:'⚠ DICTAMEN NO VALIDADO — El dictamen emitido no coincide con los indicadores del modelo ERED-FUAC para la dimensión de Usabilidad. Recuerde que la usabilidad evalúa si el usuario puede interactuar de forma fácil, intuitiva y sin fricciones, si recibe retroalimentación inmediata ante sus acciones, y si las instrucciones son claras. Revise nuevamente el recurso considerando estos indicadores e intente de nuevo.',
+    codigo:'7'
+  }
+};
+
+/* ---- simulador 1: agua ---- */
+function buildLoop(x,y,w,h,r){
+  const pts=[];
+  const seg=(ax,ay,bx,by,n)=>{for(let i=0;i<n;i++){const t=i/n;pts.push([ax+(bx-ax)*t,ay+(by-ay)*t]);}};
+  const arc=(cx,cy,a0,a1,n)=>{for(let i=0;i<=n;i++){const a=a0+(a1-a0)*(i/n);pts.push([cx+Math.cos(a)*r,cy+Math.sin(a)*r]);}};
+  seg(x+r,y,x+w-r,y,60);arc(x+w-r,y+r,-Math.PI/2,0,18);
+  seg(x+w,y+r,x+w,y+h-r,40);arc(x+w-r,y+h-r,0,Math.PI/2,18);
+  seg(x+w-r,y+h,x+r,y+h,60);arc(x+r,y+h-r,Math.PI/2,Math.PI,18);
+  seg(x,y+h-r,x,y+r,40);arc(x+r,y+r,Math.PI,Math.PI*1.5,18);
+  const cum=[0];let tot=0;
+  for(let i=1;i<pts.length;i++){tot+=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);cum.push(tot);}
+  tot+=Math.hypot(pts[0][0]-pts[pts.length-1][0],pts[0][1]-pts[pts.length-1][1]);
+  return{pts,cum,total:tot};
+}
+function pointAt(path,d){
+  const{pts,cum,total}=path;d=((d%total)+total)%total;
+  let i=0;while(i<cum.length-1&&cum[i+1]<d)i++;
+  const sl=(i<cum.length-1?cum[i+1]:total)-cum[i];
+  const t=sl>0?(d-cum[i])/sl:0;
+  const a=pts[i],b=pts[(i+1)%pts.length];
+  return[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t];
+}
+function mountWater(){
+  if(simRAF){cancelAnimationFrame(simRAF);simRAF=null;}
+  const canvas=document.getElementById('simCanvas');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const W=700,H=320;
+  canvas.width=W;canvas.height=H;
+  const x=80,y=62,w=540,h=196,r=40;
+  const path=buildLoop(x,y,w,h,r),total=path.total;
+  const N=42,parts=[];for(let i=0;i<N;i++)parts.push((i/N)*total);
+  const pEl=document.getElementById('simPressure'),vEl=document.getElementById('simVal');
+  const cx2=x+w/2,midY=y+h/2;
+  function frame(){
+    const V=parseInt(pEl.value);vEl.textContent=V+' V';
+    const speed=0.5+V*0.85;
+    ctx.clearRect(0,0,W,H);
+    ctx.beginPath();ctx.moveTo(path.pts[0][0],path.pts[0][1]);
+    for(let i=1;i<path.pts.length;i++)ctx.lineTo(path.pts[i][0],path.pts[i][1]);
+    ctx.closePath();ctx.strokeStyle='#0c1218';ctx.lineWidth=24;ctx.stroke();
+    ctx.strokeStyle='rgba(35,213,245,.3)';ctx.lineWidth=1.5;ctx.shadowBlur=6;ctx.shadowColor='rgba(35,213,245,.4)';ctx.stroke();ctx.shadowBlur=0;
+    for(let i=0;i<N;i++){parts[i]=(parts[i]+speed)%total;const p=pointAt(path,parts[i]);ctx.beginPath();ctx.arc(p[0],p[1],3,0,7);ctx.fillStyle='#a9e8ff';ctx.shadowBlur=8;ctx.shadowColor='#23d5f5';ctx.fill();}
+    ctx.shadowBlur=0;
+    // batería
+    ctx.fillStyle='#10161f';ctx.fillRect(x-14,midY-24,28,48);
+    ctx.strokeStyle='rgba(124,92,255,.7)';ctx.lineWidth=1.5;ctx.strokeRect(x-14,midY-24,28,48);
+    ctx.fillStyle='#7c5cff';ctx.font='700 13px Space Grotesk,sans-serif';ctx.textAlign='center';
+    ctx.fillText('+',x,midY-8);ctx.fillText('−',x,midY+14);
+    // válvula
+    ctx.fillStyle='#10161f';ctx.fillRect(cx2-28,y+h-10,56,20);
+    ctx.strokeStyle='rgba(124,92,255,.5)';ctx.lineWidth=1.2;ctx.strokeRect(cx2-28,y+h-10,56,20);
+    // bombillo
+    const bx=x+w,glow=0.1+V/10*0.9;
+    const g=ctx.createRadialGradient(bx,midY,2,bx,midY,38);
+    g.addColorStop(0,`rgba(255,240,150,${glow})`);g.addColorStop(1,'rgba(255,240,150,0)');
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(bx,midY,38,0,7);ctx.fill();
+    ctx.beginPath();ctx.arc(bx,midY,10,0,7);
+    ctx.fillStyle=`rgba(255,238,120,${0.3+glow*0.6})`;ctx.strokeStyle='rgba(255,230,0,.8)';ctx.lineWidth=1.8;ctx.fill();ctx.stroke();
+    // etiquetas
+    ctx.font='500 12px Inter,sans-serif';ctx.shadowBlur=0;
+    ctx.fillStyle='rgba(35,213,245,.8)';ctx.textAlign='center';ctx.fillText('CORRIENTE (caudal)',cx2,y+26);
+    ctx.fillStyle='rgba(124,92,255,.85)';ctx.textAlign='left';ctx.fillText('VOLTAJE',x+48,midY-2);
+    ctx.fillStyle='rgba(255,240,150,.8)';ctx.textAlign='right';ctx.fillText(V>=7?'¡brillando!':V>=4?'brillando':'tenue',bx-54,midY-2);
+    simRAF=requestAnimationFrame(frame);
+  }
+  frame();
+}
+
+/* ---- simulador 2: triángulo ---- */
+const triData={
+  V:{f:'V = I × R',m:'El <b>Voltaje</b> es igual a la corriente multiplicada por la resistencia.',a:'💧 Presión = caudal × estrechez de la tubería'},
+  I:{f:'I = V ÷ R',m:'La <b>Corriente</b> es igual al voltaje dividido entre la resistencia.',a:'💧 Caudal = presión ÷ estrechez de la tubería'},
+  R:{f:'R = V ÷ I',m:'La <b>Resistencia</b> es igual al voltaje dividido entre la corriente.',a:'💧 Estrechez = presión ÷ caudal'}
+};
+function mountTri(){triSet=new Set();}
+function triClick(m,btn){
+  triSet.add(m);
+  document.querySelectorAll('.tri-btn').forEach(b=>b.classList.remove('lit'));
+  btn.classList.add('lit');
+  const d=triData[m];
+  document.getElementById('triReveal').innerHTML=`<div><div class="tri-formula">${d.f}</div><div class="tri-meaning">${d.m}</div><div class="tri-analogy">${d.a}</div></div>`;
+  const p=document.getElementById('triProg');
+  p.textContent=triSet.size+'/3 fórmulas';
+  if(triSet.size>=3)p.style.color='var(--green)';
+}
+
+/* ---- simulador 3: accesibilidad ---- */
+function mountA11y(){
+  a11ySize=0;
+  const prev=document.getElementById('a11yPreview');
+  if(prev){prev.className='a11y-preview';prev.querySelector('p').style.fontSize=a11ySizes[0]+'px';}
+  document.getElementById('a11ySizeLbl').textContent='100%';
+  document.querySelectorAll('.a11y-btn-ctrl').forEach(b=>b.classList.remove('on'));
+  if('speechSynthesis'in window)speechSynthesis.cancel();
+}
+function a11yToggle(kind,btn){
+  const on=btn.classList.toggle('on');
+  const prev=document.getElementById('a11yPreview');
+  if(kind==='hc')prev.classList.toggle('hc',on);
+  if(kind==='calm')prev.classList.toggle('calm',on);
+  btn.textContent=on?'✓ Activado':btn.dataset.label;
+}
+function a11ySizeChange(dir){
+  a11ySize=Math.max(0,Math.min(a11ySizes.length-1,a11ySize+dir));
+  const px=a11ySizes[a11ySize];
+  document.querySelector('#a11yPreview p').style.fontSize=px+'px';
+  document.getElementById('a11ySizeLbl').textContent=Math.round((px/14)*100)+'%';
+}
+function a11yReadAloud(){
+  if(!('speechSynthesis'in window)){alert('Tu navegador no soporta narración por voz.');return;}
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(document.querySelector('#a11yPreview p').innerText);
+  u.lang='es-ES';u.rate=0.95;speechSynthesis.speak(u);
+}
+
+/* ---- HTML de los simuladores ---- */
+function simHTML(n){
+  if(n===1) return `
+    <canvas id="simCanvas" style="width:100%;display:block;aspect-ratio:700/320"></canvas>
+    <div class="sim-ctrl">
+      <label>🔋 Presión (Voltaje)</label>
+      <input id="simPressure" type="range" min="1" max="10" value="4" oninput="document.getElementById('simVal').textContent=this.value+' V'">
+      <span class="sim-val" id="simVal">4 V</span>
+    </div>
+    <div class="sim-note">Simulador de Ohm-Vengers · 100% offline</div>`;
+  if(n===2) return `
+    <div class="tri-section">
+      <div class="tri-wrap">
+        <svg viewBox="0 0 300 220" style="width:100%">
+          <polygon points="150,16 296,210 4,210" fill="rgba(35,213,245,.04)" stroke="rgba(35,213,245,.2)" stroke-width="1.5"/>
+        </svg>
+        <button class="tri-btn" id="tbV" onclick="triClick('V',this)">V</button>
+        <button class="tri-btn" id="tbI" onclick="triClick('I',this)">I</button>
+        <button class="tri-btn" id="tbR" onclick="triClick('R',this)">R</button>
+        <div class="tri-prog" id="triProg">0/3 fórmulas</div>
+      </div>
+      <div class="tri-reveal" id="triReveal"><p class="tri-hint">👆 Toca V, I o R para ver la fórmula</p></div>
+    </div>
+    <div class="sim-note">Triángulo interactivo de Ohm-Vengers · 100% offline</div>`;
+  if(n===3) return `
+    <div class="a11y-section">
+      <div class="a11y-toolbar">
+        <button class="a11y-btn-ctrl" data-label="Alto contraste" onclick="a11yToggle('hc',this)">Alto contraste</button>
+        <div class="a11y-size-row">
+          <button onclick="a11ySizeChange(-1)">A−</button>
+          <span id="a11ySizeLbl">100%</span>
+          <button onclick="a11ySizeChange(1)">A+</button>
+        </div>
+        <button class="a11y-btn-ctrl" data-label="Modo calma" onclick="a11yToggle('calm',this)">Modo calma</button>
+        <button class="a11y-btn-ctrl" onclick="a11yReadAloud()">🔊 Leer en voz alta</button>
+      </div>
+      <div class="a11y-preview" id="a11yPreview">
+        <p>Este es un texto de muestra de Ohm-Vengers. Prueba activar el alto contraste, cambiar el tamaño de texto o escuchar la narración por voz. Estas son las mismas funciones reales del recurso, disponibles para estudiantes con diferentes necesidades.</p>
+      </div>
+    </div>
+    <div class="sim-note">Panel de accesibilidad de Ohm-Vengers · funciona 100% offline</div>`;
+}
+
+/* ---- motor principal ---- */
+function openExp(n){
+  if(n>unlocked)return;
+  currentExp=n;
+  const d=expedientes[n];
+  document.getElementById('expCrumb').innerHTML=`Expediente <b>${d.num}</b>`;
+  document.getElementById('expEyebrow').textContent=`Modelo ERED-FUAC · Dimensión: ${d.criterio}`;
+  document.getElementById('expTitle').textContent=d.titulo;
+  document.getElementById('recName').textContent=d.recurso.nombre;
+  document.getElementById('recDesc').textContent=d.recurso.desc;
+  document.getElementById('recTags').innerHTML=d.recurso.tags.map(t=>`<span class="rec-tag">${t}</span>`).join('');
+  document.getElementById('simSlot').innerHTML=simHTML(n);
+  document.getElementById('expCounter').textContent = `Expediente ${n} de 3 · ⏱ ~5 min`;
+  document.getElementById('expObjetivoTxt').textContent = d.objetivo;
+  document.getElementById('eredDim').textContent = 'Dimensión evaluada: '+d.dimension;
+  document.getElementById('analisisItems').innerHTML = d.analisis.map(a=>
+    `<div class="analisis-item"><span class="analisis-ico">👁️</span><span>${a}</span></div>`).join('');
+  // ayuda contextual
+  document.getElementById('ayudaTitle').textContent = d.ayuda.titulo+' — ¿Qué evalúa esta dimensión?';
+  document.getElementById('ayudaDesc').textContent = d.ayuda.desc;
+  document.getElementById('eredAyuda').style.display='none';
+  document.getElementById('eredList').innerHTML=d.checklist.map(c=>`<div class="ered-item"><span class="ered-check">✓</span><span>${c}</span></div>`).join('');
+  document.getElementById('qText').textContent=d.pregunta;
+  document.getElementById('dictList').innerHTML=d.opciones.map((o,i)=>`<button class="dict-btn" onclick="elegirDict(${i})"><span class="dict-ico">📄</span><span>${o.t}</span></button>`).join('');
+  // reset resultado
+  document.getElementById('analyzing').className='analyzing';
+  ['anL1','anL2','anL3'].forEach(id=>document.getElementById(id).classList.remove('on'));
+  document.getElementById('anBar').style.width='0%';
+  document.getElementById('resultBox').className='result-box';
+  document.getElementById('keyRow').style.display='none';
+  document.getElementById('resultActions').innerHTML='';
+  show('expediente');
+  // montar simulador
+  if(simRAF){cancelAnimationFrame(simRAF);simRAF=null;}
+  if('speechSynthesis'in window)speechSynthesis.cancel();
+  requestAnimationFrame(()=>{
+    if(n===1)mountWater();
+    else if(n===2)mountTri();
+    else if(n===3)mountA11y();
+  });
+}
+
+function elegirDict(i){
+  const d=expedientes[currentExp];
+  const btns=document.querySelectorAll('.dict-btn');
+  btns.forEach(b=>b.disabled=true);
+  const an=document.getElementById('analyzing');
+  an.className='analyzing on';
+  ['anL1','anL2','anL3'].forEach(id=>document.getElementById(id).classList.remove('on'));
+  document.getElementById('anBar').style.width='0%';
+  ['anL1','anL2','anL3'].forEach((id,idx)=>setTimeout(()=>document.getElementById(id).classList.add('on'),200*idx));
+  requestAnimationFrame(()=>document.getElementById('anBar').style.width='100%');
+  setTimeout(()=>mostrarResultado(i,d,btns),1300);
+}
+
+function mostrarResultado(i,d,btns){
+  document.getElementById('analyzing').className='analyzing';
+  const ok=d.opciones[i].ok;
+  const rb=document.getElementById('resultBox');
+  btns[i].classList.add(ok?'ok':'fail');
+  if(!ok)btns.forEach((b,idx)=>{if(idx!==i)b.classList.add('dim');});
+  rb.className='result-box on '+(ok?'ok':'fail');
+  document.getElementById('resultTitle').textContent=ok?'✓ Dictamen validado — Recurso aprobado en este criterio':'✕ Dictamen rechazado por el sistema de validación';
+  document.getElementById('resultText').textContent=ok?d.feedOk:d.feedFail;
+  const kr=document.getElementById('keyRow');
+  const ra=document.getElementById('resultActions');
+  if(ok){
+    kr.style.display='flex';
+    const llaveNombres={1:'Pertinencia',2:'Calidad',3:'Usabilidad'};
+    document.getElementById('keyTxt').textContent=`🔑 LLAVE DE ${llaveNombres[currentExp].toUpperCase()} OBTENIDA · CÓDIGO PARCIAL: ${d.codigo}`;
+    ra.innerHTML=`<button class="btn" style="width:auto" onclick="completarExp(${currentExp})">Volver al Centro de Operaciones</button>`;
+  } else {
+    ra.innerHTML=`<button class="btn-ghost" onclick="reintentarExp()">↺ Reabrir expediente</button>`;
+  }
+}
+
+function reintentarExp(){ openExp(currentExp); }
+
+function toggleAyuda(){
+  const el=document.getElementById('eredAyuda');
+  el.style.display=el.style.display==='none'?'block':'none';
+}
+
+function completarExp(n){
+  completed=Math.max(completed,n);
+  unlocked=Math.max(unlocked,n+1);
+  saveProgress();
+  if(simRAF){cancelAnimationFrame(simRAF);simRAF=null;}
+  if('speechSynthesis'in window)speechSynthesis.cancel();
+  const d=expedientes[n];
+  const llaveNombres={1:'🔑 Llave de Pertinencia — cód. 3',2:'🔑 Llave de Calidad — cód. 5',3:'🔑 Llave de Usabilidad — cód. 7'};
+  document.getElementById('cerradoTitulo').textContent=d.titulo;
+  document.getElementById('cerradoDim').textContent=d.dimension;
+  document.getElementById('cerradoLlave').textContent=llaveNombres[n];
+  const informes={
+    1:'Dictamen: Alta pertinencia. El contenido aborda exactamente voltaje, corriente y resistencia, coherente con el objetivo declarado y adecuado al nivel de grado décimo. La analogía del agua es una estrategia didáctica sólida para introducir estos conceptos.',
+    2:'Dictamen: Alta calidad. Las tres fórmulas son matemáticamente correctas y equivalentes. El recurso retoma la analogía de la Sesión 1, manteniendo coherencia pedagógica interna y favoreciendo la transferencia del aprendizaje.',
+    3:'Dictamen: Alta usabilidad. Cada control produce retroalimentación inmediata y visible. Las etiquetas son claras y no se requiere conocimiento técnico previo, cumpliendo los principios del DUA y el Decreto 1421 de 2017.'
+  };
+  document.getElementById('cerradoInforme').textContent=informes[n];
+  show('expCerrado');
+}
+
+function salirExpediente(){
+  if(simRAF){cancelAnimationFrame(simRAF);simRAF=null;}
+  if('speechSynthesis'in window)speechSynthesis.cancel();
+  show('hub');
+  renderHub();
+}
+
+function resetAll(){
+  unlocked=1; completed=0;
+  try{localStorage.removeItem('guardianes_v1');}catch(e){}
+  renderHub();
+}
+
+/* ---- secuencia final animada ---- */
+let llavesPulsadas = new Set();
+let codigoIngresado = [];
+const CODIGO_CORRECTO = ['3','5','7'];
+
+function goFinal(){
+  // resetear estado de la secuencia
+  llavesPulsadas = new Set();
+  codigoIngresado = [];
+  // resetear puertas
+  for(let i=1;i<=3;i++){
+    document.getElementById('puerta'+i).classList.remove('abierta');
+    document.getElementById('front'+i).querySelector('.puerta-icon').textContent='🔒';
+    document.getElementById('llave'+i).classList.remove('usada');
+  }
+  // resetear código
+  ['cd1','cd2','cd3'].forEach(id=>{
+    const el=document.getElementById(id);
+    el.textContent='_'; el.className='code-digit';
+  });
+  document.getElementById('btnActivar').disabled=true;
+  document.getElementById('codeHint').textContent='El código está formado por los 3 dígitos obtenidos en cada expediente';
+  // resetear fases
+  document.getElementById('fase1').style.display='flex';
+  document.getElementById('fase2').style.display='none';
+  document.getElementById('fase3').style.display='none';
+  // certificado
+  document.getElementById('certNames').textContent = teamData.length ? teamData.join(' · ') : 'Agente Guardián';
+  const fecha = new Date().toLocaleDateString('es-CO',{year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('certMeta').textContent = 'Modelo ERED-FUAC · '+fecha;
+  show('final');
+}
+
+function usarLlave(n){
+  if(llavesPulsadas.has(n)) return;
+  llavesPulsadas.add(n);
+  // marcar llave usada
+  document.getElementById('llave'+n).classList.add('usada');
+  // animar apertura de puerta
+  const puerta = document.getElementById('puerta'+n);
+  const icon = document.getElementById('front'+n).querySelector('.puerta-icon');
+  puerta.classList.add('abierta');
+  setTimeout(()=>{ icon.textContent='🔓'; },600);
+  // hint dinámico
+  const restantes = 3 - llavesPulsadas.size;
+  const hint = document.getElementById('llaveHint');
+  if(restantes>0){
+    hint.textContent = restantes===2 ? '¡Puerta 1 abierta! Faltan 2 llaves...' : '¡Puerta 2 abierta! Falta 1 llave más...';
+  } else {
+    hint.textContent = '¡Las 3 puertas están abiertas!';
+    hint.style.color = 'var(--green)';
+    setTimeout(()=>{
+      document.getElementById('fase1').style.display='none';
+      document.getElementById('fase2').style.display='flex';
+    }, 1400);
+  }
+}
+
+function ingresarDigito(d){
+  if(codigoIngresado.length>=3) return;
+  codigoIngresado.push(d);
+  const ids=['cd1','cd2','cd3'];
+  const el=document.getElementById(ids[codigoIngresado.length-1]);
+  el.textContent=d; el.className='code-digit filled';
+  if(codigoIngresado.length===3){
+    document.getElementById('btnActivar').disabled=false;
+  }
+}
+
+function borrarDigito(){
+  if(codigoIngresado.length===0) return;
+  const ids=['cd1','cd2','cd3'];
+  const el=document.getElementById(ids[codigoIngresado.length-1]);
+  el.textContent='_'; el.className='code-digit';
+  codigoIngresado.pop();
+  document.getElementById('btnActivar').disabled=true;
+}
+
+function activarRepositorio(){
+  const correcto = codigoIngresado.join('')===CODIGO_CORRECTO.join('');
+  const ids=['cd1','cd2','cd3'];
+  if(correcto){
+    ids.forEach(id=>{ const e=document.getElementById(id); e.className='code-digit ok'; });
+    setTimeout(()=>{
+      document.getElementById('fase2').style.display='none';
+      document.getElementById('fase3').style.display='flex';
+    }, 900);
+  } else {
+    ids.forEach(id=>{ const e=document.getElementById(id); e.className='code-digit error'; });
+    document.getElementById('codeHint').textContent='⚠ Código incorrecto. Revisa los dígitos obtenidos en cada expediente.';
+    setTimeout(()=>{
+      codigoIngresado=[];
+      ids.forEach(id=>{ const e=document.getElementById(id); e.textContent='_'; e.className='code-digit'; });
+      document.getElementById('btnActivar').disabled=true;
+      document.getElementById('codeHint').textContent='Intenta de nuevo';
+    }, 1200);
+  }
+}
+
+/* ---- localStorage ---- */
+const SAVE_KEY = 'guardianes_v1';
+function saveProgress(){
+  try{
+    localStorage.setItem(SAVE_KEY, JSON.stringify({unlocked, completed, teamData}));
+  }catch(e){}
+}
+function loadProgress(){
+  try{
+    const raw = localStorage.getItem(SAVE_KEY);
+    if(!raw) return false;
+    const d = JSON.parse(raw);
+    if(typeof d.unlocked==='number') unlocked=d.unlocked;
+    if(typeof d.completed==='number') completed=d.completed;
+    if(Array.isArray(d.teamData) && d.teamData.length) teamData=d.teamData;
+    return true;
+  }catch(e){return false;}
+}
+
+/* ---- guardar en cada avance ---- */
+const _completarExp = completarExp;
+completarExp = function(n){
+  _completarExp(n);
+  saveProgress();
+};
+function cargarIframe(){
+  document.getElementById('briefAccessCard').style.display='none';
+  const wrap=document.getElementById('briefIframeWrap');
+  wrap.style.display='block';
+  document.getElementById('briefIframe').src='https://carlossanjuan2025.github.io/ohm-vengers-electricidad/';
+}
+function cerrarIframe(){
+  document.getElementById('briefIframe').src='';
+  document.getElementById('briefIframeWrap').style.display='none';
+  document.getElementById('briefAccessCard').style.display='block';
+}
+
+function acceptMission(){
+  teamData=[...document.querySelectorAll('.member-input')].map(i=>i.value.trim()).filter(Boolean);
+  saveProgress();
+  show('briefing');
+}
+
+/* ---- inicialización ---- */
+(function init(){
+  const hasSave = loadProgress();
+  if(hasSave && teamData.length){
+    const list = document.getElementById('teamList');
+    list.innerHTML = '';
+    teamData.forEach((name,i)=>{
+      const row = document.createElement('div');
+      row.className='team-row';
+      row.innerHTML=`<input type="text" class="member-input" placeholder="Nombre completo del integrante ${i+1}" maxlength="50" oninput="checkTeam()"><button class="rm-btn" onclick="removeMember(this)" ${teamData.length<=1?'disabled':''} aria-label="Quitar">✕</button>`;
+      list.appendChild(row);
+      row.querySelector('input').value = name;
+    });
+    updateTeamCount();
+    checkTeam();
+    const btn = document.getElementById('acceptBtn');
+    if(btn && completed>0) btn.textContent='⚡ Continuar Expediente';
+  }
+})();
+</script>
+</body>
+</html>
